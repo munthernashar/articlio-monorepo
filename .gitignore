@@ -35,3 +35,6 @@ coverage
 
 # EAS
 .eas
+
+# Vercel
+.vercel
