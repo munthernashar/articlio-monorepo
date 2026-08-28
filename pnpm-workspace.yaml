@@ -1,3 +1,7 @@
-packages:
-  - "apps/*"
-  - "packages/*"
+# This file is backed up as pnpm-workspace.yaml.bak
+# Temporarily disabled for Vercel deployment
+# Uncomment when deploying with pnpm locally
+
+# packages:
+#   - "apps/*"
+#   - "packages/*"
