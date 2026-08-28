@@ -1,3 +1,6 @@
 apps/mobile
 node_modules
 .git
+turbo.json
+pnpm-workspace.yaml
+packages
