@@ -7,8 +7,8 @@ Ein Monorepo für die Articlio-Plattform mit Web-App (Vite + React) und Mobile-A
 ```
 articlio-monorepo/
 ├── apps/
-│   ├── web/              # Vite + React Web-App
-│   └── mobile/           # Expo + React Native Mobile-App
+│   ├── web/              # Vite + React Web-App (Vercel)
+│   └── mobile/           # Expo + React Native Mobile-App (EAS Build)
 ├── packages/
 │   ├── types/            # TypeScript-Typen (shared)
 │   ├── api/              # Supabase-Client & API-Calls (shared)
@@ -16,6 +16,7 @@ articlio-monorepo/
 │   └── ui/               # UI-Komponenten (shared)
 ├── turbo.json            # Turborepo-Konfiguration
 ├── pnpm-workspace.yaml   # pnpm Workspaces
+├── vercel.json           # Vercel Deployment-Konfiguration
 └── package.json          # Root-Scripts
 ```
 
@@ -23,9 +24,9 @@ articlio-monorepo/
 
 ### Voraussetzungen
 
-- Node.js >= 20
-- pnpm >= 9.15
-- Expo CLI ( für Mobile)
+- **Node.js >= 20**
+- **pnpm >= 9.15** (`npm install -g pnpm@9.15`)
+- **Expo CLI** (nur für Mobile: `npm install -g expo-cli`)
 
 ### Installation
 
@@ -45,14 +46,15 @@ cp .env.example .env
 ### Entwicklung
 
 ```bash
-# Alle Apps starten
+# Alle Apps starten (Web + Mobile)
 pnpm dev
 
-# Nur Web-App
+# Nur Web-App starten
 pnpm dev:web
 
-# Nur Mobile-App
-pnpm dev:mobile
+# Nur Mobile-App starten
+cd apps/mobile
+pnpm dev
 ```
 
 ### Build
@@ -61,43 +63,64 @@ pnpm dev:mobile
 # Alle Apps bauen
 pnpm build
 
-# Nur Web-App
+# Nur Web-App bauen (Vercel macht das automatisch)
 pnpm build:web
 
-# Nur Mobile-App (EAS Build)
-pnpm build:mobile
+# Nur Mobile-App bauen (EAS Build)
+cd apps/mobile
+eas build --platform ios
+eas build --platform android
 ```
 
 ## 📦 Shared Packages
 
 ### `@articlio/types`
 
-Zentralisierte TypeScript-Typen für:
-- Datenbank-Modelle (aus Supabase)
-- API-Responses
-- UI-Props
+Zentralisierte TypeScript-Typen:
+- Database Schema (aus Supabase)
+- API Response Types
+- Domain Models
+
+**Verwendung:**
+```typescript
+import type { Profile, Session, Prompt } from '@articlio/types'
+```
 
 ### `@articlio/api`
 
 Supabase-Client und API-Funktionen:
-- Auth (Login, Logout, Session-Management)
-- Blog-Posts (CRUD, Filter, Search)
-- Comments & Interactions
+- Auth (login, logout, session management)
+- Profile (get, update)
+- Automatische Environment-Variable-Erkennung (Vite + Expo)
+
+**Verwendung:**
+```typescript
+import { signInWithEmailPassword, signOut, getCurrentUser } from '@articlio/api'
+```
 
 ### `@articlio/utils`
 
 Helper-Funktionen:
-- Date-Formatting
-- String-Utilities
-- Validation-Functions
+- `formatDate`, `formatDateTime`, `formatRelativeTime`
+- `isValidEmail`, `isValidUrl`
+- `truncateText`, `capitalize`, `slugify`
+
+**Verwendung:**
+```typescript
+import { formatDate, truncateText } from '@articlio/utils'
+```
 
 ### `@articlio/ui`
 
 Geteilte UI-Komponenten:
-- BlogCard
-- CommentList
-- LoadingSpinner
-- ErrorBoundary
+- `BlogCard` (Prompt/Article Card)
+- `LoadingSpinner`
+- `ErrorBoundary`
+
+**Verwendung:**
+```typescript
+import { BlogCard, LoadingSpinner } from '@articlio/ui'
+```
 
 ## 🔧 Tech Stack
 
@@ -107,39 +130,136 @@ Geteilte UI-Komponenten:
 | **Mobile** | Expo SDK 54 + React Native + TypeScript |
 | **Backend** | Supabase (PostgreSQL, Auth, Storage) |
 | **Build** | Turborepo + pnpm Workspaces |
-| **Deployment** | Vercel (Web) + EAS (Mobile) |
+| **Deployment** | Vercel (Web) + EAS Build (Mobile) |
+
+## 🌐 Vercel Deployment (Web-App)
+
+### Einrichtung
+
+1. **Vercel Account verbinden:**
+   - Gehe zu [vercel.com](https://vercel.com)
+   - Klicke "Add New Project"
+   - Wende dein GitHub-Repo `articlio-monorepo` aus
+
+2. **Einstellungen konfigurieren:**
+   - **Framework Preset:** Vite
+   - **Root Directory:** `.` (lassen)
+   - **Build Command:** `pnpm --filter=web build`
+   - **Output Directory:** `apps/web/dist`
+   - **Install Command:** `pnpm install`
+
+3. **Environment Variables hinzufügen:**
+   - `VITE_SUPABASE_URL` = deine Supabase URL
+   - `VITE_SUPABASE_ANON_KEY` = dein Supabase Anon Key
+
+4. **Deploy:**
+   - Klicke "Deploy"
+   - Vercel baut automatisch bei jedem `git push`
+
+### Alternative: `vercel.json`
+
+Die `vercel.json` im Repo-Root konfiguriert Vercel automatisch:
+
+```json
+{
+  "buildCommand": "pnpm --filter=web build",
+  "outputDirectory": "apps/web/dist",
+  "installCommand": "pnpm install"
+}
+```
+
+Vercel erkennt diese Konfiguration und verwendet sie automatisch.
 
 ## 📱 Mobile App Stores
 
 ### iOS
 
-- Apple Developer Account erforderlich ($99/Jahr)
-- Build mit: `cd apps/mobile && eas build --platform ios`
-- Submit via: `eas submit --platform ios`
+**Voraussetzungen:**
+- Apple Developer Account ($99/Jahr)
+- macOS mit Xcode (oder EAS Build in der Cloud)
+
+**Build & Deploy:**
+```bash
+cd apps/mobile
+
+# Development Build (zum Testen auf deinem iPhone)
+eas build --platform ios --profile development
+
+# Production Build (App Store)
+eas build --platform ios --profile production
+eas submit --platform ios
+```
 
 ### Android
 
-- Google Play Account erforderlich ($25 einmalig)
-- Build mit: `cd apps/mobile && eas build --platform android`
-- Submit via: `eas submit --platform android`
+**Voraussetzungen:**
+- Google Play Developer Account ($25 einmalig)
+
+**Build & Deploy:**
+```bash
+cd apps/mobile
+
+# Development Build (APK)
+eas build --platform android --profile development
+
+# Production Build (Play Store)
+eas build --platform android --profile production
+eas submit --platform android
+```
 
 ## 🔐 Environment Variables
 
-Erstelle `.env` im Root:
+### Root `.env` (lokale Entwicklung)
 
 ```env
 # Supabase
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key
-
-# Web (optional)
-VITE_SUPABASE_URL=$SUPABASE_URL
-VITE_SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
-
-# Mobile (wird von Expo automatisch geladen)
-EXPO_PUBLIC_SUPABASE_URL=$SUPABASE_URL
-EXPO_PUBLIC_SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
 ```
+
+### Web-App (`apps/web/.env`)
+
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
+### Mobile-App (`apps/mobile/.env`)
+
+```env
+EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+## 🔄 Workflow: Änderungen an Shared Packages
+
+### Beispiel: Neue API-Funktion hinzufügen
+
+1. **In `packages/api/src/auth.ts` ändern:**
+```typescript
+export async function resetPassword(email: string) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email)
+  return { error }
+}
+```
+
+2. **In beiden Apps verwenden:**
+```typescript
+// apps/web/src/components/ResetPassword.tsx
+import { resetPassword } from '@articlio/api'
+
+// apps/mobile/app/reset-password.tsx
+import { resetPassword } from '@articlio/api'
+```
+
+3. **Commit & Push:**
+```bash
+git add .
+git commit -m "feat: Add reset password function"
+git push
+```
+
+**Vorteil:** Beide Apps verwenden den gleichen Code, kein Copy-Paste!
 
 ## 🧪 Testing
 
@@ -152,6 +272,7 @@ pnpm test --filter=web
 
 # Nur Shared Packages
 pnpm test --filter=@articlio/api
+pnpm test --filter=@articlio/utils
 ```
 
 ## 📝 License
