@@ -1,7 +1,2 @@
-# This file is backed up as pnpm-workspace.yaml.bak
-# Temporarily disabled for Vercel deployment
-# Uncomment when deploying with pnpm locally
-
-# packages:
-#   - "apps/*"
-#   - "packages/*"
+# DELETED - This file causes Vercel to use pnpm which has registry issues
+# Use npm for Vercel deployment
