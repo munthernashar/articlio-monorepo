@@ -1,36 +1,23 @@
-import { useEffect, useState } from 'react'
-import { getCurrentUser, signOut } from '@articlio/api'
-import type { User } from '@supabase/supabase-js'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { ErrorBoundary } from '@articlio/ui'
+import { LandingPage } from './pages/LandingPage'
+import { LoginPage, SignupPage } from './pages/auth'
+import { DashboardPage } from './pages/DashboardPage'
+import { NotFoundPage } from './pages/NotFoundPage'
 
 function App() {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    getCurrentUser().then(setUser).finally(() => setLoading(false))
-  }, [])
-
-  async function handleLogout() {
-    await signOut()
-    setUser(null)
-  }
-
-  if (loading) {
-    return <div>Lade...</div>
-  }
-
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Articlio Web</h1>
-      {user ? (
-        <div>
-          <p>Eingeloggt als: {user.email}</p>
-          <button onClick={handleLogout}>Logout</button>
-        </div>
-      ) : (
-        <p>Nicht eingeloggt</p>
-      )}
-    </div>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </BrowserRouter>
+    </ErrorBoundary>
   )
 }
 
