@@ -4,11 +4,11 @@ import { configureSupabaseClient } from '@articlio/api'
 import App from './App'
 import './styles/index.css'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? import.meta.env.SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? import.meta.env.SUPABASE_ANON_KEY
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY')
+  throw new Error('Missing Supabase URL or anon key')
 }
 
 configureSupabaseClient(supabaseUrl, supabaseAnonKey)
