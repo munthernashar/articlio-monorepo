@@ -9,8 +9,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@articlio/types": "workspace:*",
-    "@articlio/utils": "workspace:*"
+    "@articlio/types": "*",
+    "@articlio/utils": "*"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
