@@ -1,0 +1,3891 @@
+{
+  "exportedAt": "2026-08-16T06:24:34.376Z",
+  "rowCount": 37,
+  "activeCount": 11,
+  "rows": [
+    {
+      "id": "bab96f14-afc4-44cf-90bf-410a6e1d17ad",
+      "name": "Coach Feedback",
+      "model": "gpt-4.1-mini",
+      "version": 1,
+      "category": "coach",
+      "metadata": {
+        "deactivated_at": "2026-08-15T20:56:39.735408",
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13",
+        "deactivated_reason": "befund_j_unreachable_dead_code_caller_removed"
+      },
+      "is_active": false,
+      "created_at": "2026-04-22T11:18:23.88676+00:00",
+      "created_by": null,
+      "prompt_key": "coach_feedback",
+      "updated_at": "2026-08-15T20:56:39.735408+00:00",
+      "updated_by": null,
+      "description": "",
+      "system_prompt": "Du bist ein präziser Deutsch-Coach und lieferst ausschließlich valides JSON.",
+      "response_format": "json_object",
+      "developer_prompt": "Analysiere Grammatik, Wortschatz und Natürlichkeit. Keine zusätzlichen Schlüssel ausgeben.",
+      "max_output_tokens": 700,
+      "user_prompt_template": "Analysiere diese Lerneräußerung: \"{{learner_utterance}}\". Niveau: {{level}}. Gib summary, corrections und next_steps zurück.",
+      "expected_output_schema_json": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "5b413b90-8949-445f-b3ec-3a3332135988",
+      "name": "Coach Next Step",
+      "model": "gpt-4.1-mini",
+      "version": 1,
+      "category": "coach",
+      "metadata": {
+        "source": "supabase_prompt_library",
+        "runtime": "coach",
+        "required": true,
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13",
+        "seed_content_policy": "runtime_prompts_managed_via_admin_db_only",
+        "seed_content_neutralized": true,
+        "seed_content_neutralized_at": "2026-05-15T06:16:10.424797"
+      },
+      "is_active": false,
+      "created_at": "2026-05-12T15:44:33.232458+00:00",
+      "created_by": null,
+      "prompt_key": "coach_next_step",
+      "updated_at": "2026-05-15T06:16:10.424797+00:00",
+      "updated_by": null,
+      "description": "Bestimmt den nächsten didaktischen Schritt im laufenden Session-Verlauf.",
+      "system_prompt": "",
+      "response_format": "json_object",
+      "developer_prompt": "",
+      "max_output_tokens": 550,
+      "user_prompt_template": "",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "step_type",
+          "coach_message",
+          "learner_action",
+          "reason"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string"
+          },
+          "step_type": {
+            "enum": [
+              "clarify",
+              "practice",
+              "transfer",
+              "review"
+            ],
+            "type": "string"
+          },
+          "coach_message": {
+            "type": "string"
+          },
+          "learner_action": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": [
+        {
+          "key": "session_goal",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "learner_turn",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "context_json",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "faa48edd-06d5-428c-9a5c-62fa99e53fae",
+      "name": "Coach Reflection Interpreter",
+      "model": "gpt-4.1-mini",
+      "version": 1,
+      "category": "coach",
+      "metadata": {
+        "source": "supabase_prompt_library",
+        "runtime": "coach",
+        "required": true,
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13",
+        "seed_content_policy": "runtime_prompts_managed_via_admin_db_only",
+        "seed_content_neutralized": true,
+        "seed_content_neutralized_at": "2026-05-15T06:16:10.424797"
+      },
+      "is_active": false,
+      "created_at": "2026-05-12T15:44:33.232458+00:00",
+      "created_by": null,
+      "prompt_key": "coach_reflection_interpreter",
+      "updated_at": "2026-05-15T06:16:10.424797+00:00",
+      "updated_by": null,
+      "description": "Interpretiert Selbstreflexion und leitet eine unterstützende Lernfokussierung ab.",
+      "system_prompt": "",
+      "response_format": "json_object",
+      "developer_prompt": "",
+      "max_output_tokens": 600,
+      "user_prompt_template": "",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "reflection_state",
+          "interpreted_need",
+          "supportive_response",
+          "suggested_focus"
+        ],
+        "properties": {
+          "suggested_focus": {
+            "type": "string"
+          },
+          "interpreted_need": {
+            "type": "string"
+          },
+          "reflection_state": {
+            "enum": [
+              "stable",
+              "uncertain",
+              "overloaded",
+              "confident"
+            ],
+            "type": "string"
+          },
+          "supportive_response": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": [
+        {
+          "key": "learner_reflection",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "learning_context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "recent_signals_json",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "1c7f744a-2dc5-496d-9d2a-633bfeba9faa",
+      "name": "Coach Session Completion",
+      "model": "gpt-4.1-mini",
+      "version": 1,
+      "category": "coach",
+      "metadata": {
+        "source": "supabase_prompt_library",
+        "runtime": "coach",
+        "required": true,
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13",
+        "seed_content_policy": "runtime_prompts_managed_via_admin_db_only",
+        "seed_content_neutralized": true,
+        "seed_content_neutralized_at": "2026-05-15T06:16:10.424797"
+      },
+      "is_active": false,
+      "created_at": "2026-05-12T15:44:33.232458+00:00",
+      "created_by": null,
+      "prompt_key": "coach_session_completion",
+      "updated_at": "2026-05-15T06:16:10.424797+00:00",
+      "updated_by": null,
+      "description": "Fasst den Session-Abschluss zusammen und markiert verbleibenden Fokus.",
+      "system_prompt": "",
+      "response_format": "json_object",
+      "developer_prompt": "",
+      "max_output_tokens": 700,
+      "user_prompt_template": "",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "completion_status",
+          "summary",
+          "retained_strength",
+          "remaining_focus",
+          "next_session_hint"
+        ],
+        "properties": {
+          "summary": {
+            "type": "string"
+          },
+          "remaining_focus": {
+            "type": "string"
+          },
+          "completion_status": {
+            "enum": [
+              "completed",
+              "partially_completed",
+              "not_completed"
+            ],
+            "type": "string"
+          },
+          "next_session_hint": {
+            "type": "string"
+          },
+          "retained_strength": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": [
+        {
+          "key": "session_goal",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "session_findings_json",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "current_state",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "3f21bbf0-235b-44c8-98b0-942b60f9ce8a",
+      "name": "Coach Session Plan",
+      "model": "gpt-4.1-mini",
+      "version": 1,
+      "category": "coach",
+      "metadata": {
+        "source": "supabase_prompt_library",
+        "runtime": "coach",
+        "required": true,
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13",
+        "seed_content_policy": "runtime_prompts_managed_via_admin_db_only",
+        "seed_content_neutralized": true,
+        "seed_content_neutralized_at": "2026-05-15T06:16:10.424797"
+      },
+      "is_active": false,
+      "created_at": "2026-05-12T15:44:33.232458+00:00",
+      "created_by": null,
+      "prompt_key": "coach_session_plan",
+      "updated_at": "2026-05-15T06:16:10.424797+00:00",
+      "updated_by": null,
+      "description": "Erstellt einen strukturierten Plan für die aktuelle Coach-Session.",
+      "system_prompt": "",
+      "response_format": "json_object",
+      "developer_prompt": "",
+      "max_output_tokens": 700,
+      "user_prompt_template": "",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "objective",
+          "priorities",
+          "session_focus",
+          "success_signal"
+        ],
+        "properties": {
+          "objective": {
+            "type": "string"
+          },
+          "priorities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "session_focus": {
+            "type": "string"
+          },
+          "success_signal": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": [
+        {
+          "key": "learner_level",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "focus_topic",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "observed_patterns_json",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "recent_notes",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "25d0422f-f7ff-4a80-a2be-f11e57a65258",
+      "name": "Coach Training Recommendation",
+      "model": "gpt-4.1-mini",
+      "version": 1,
+      "category": "coach",
+      "metadata": {
+        "source": "supabase_prompt_library",
+        "runtime": "coach",
+        "required": true,
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13",
+        "seed_content_policy": "runtime_prompts_managed_via_admin_db_only",
+        "seed_content_neutralized": true,
+        "seed_content_neutralized_at": "2026-05-15T06:16:10.424797"
+      },
+      "is_active": false,
+      "created_at": "2026-05-12T15:44:33.232458+00:00",
+      "created_by": null,
+      "prompt_key": "coach_training_recommendation",
+      "updated_at": "2026-05-15T06:16:10.424797+00:00",
+      "updated_by": null,
+      "description": "Leitet eine konkrete Trainingsrichtung für die nächste Lernphase ab.",
+      "system_prompt": "",
+      "response_format": "json_object",
+      "developer_prompt": "",
+      "max_output_tokens": 650,
+      "user_prompt_template": "",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "recommendation",
+          "rationale",
+          "practice_format",
+          "time_scope"
+        ],
+        "properties": {
+          "rationale": {
+            "type": "string"
+          },
+          "time_scope": {
+            "type": "string"
+          },
+          "recommendation": {
+            "type": "string"
+          },
+          "practice_format": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": [
+        {
+          "key": "learner_profile_json",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "pattern_summary_json",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "available_time",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "d888c4c3-7d12-47a1-b659-c4a63aa38910",
+      "name": "Daily Prompt Generator",
+      "model": "gpt-4.1-mini",
+      "version": 2,
+      "category": "daily",
+      "metadata": {
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13"
+      },
+      "is_active": false,
+      "created_at": "2026-04-23T08:16:22.14718+00:00",
+      "created_by": null,
+      "prompt_key": "daily_prompt_generator",
+      "updated_at": "2026-08-15T21:18:33.602496+00:00",
+      "updated_by": null,
+      "description": "",
+      "system_prompt": "You are a conversation prompt generator for adult German learners living in Germany.\nGenerate one natural, motivating speaking prompt for a daily speaking session.\nReturn valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "The prompt should:\n- feel realistic\n- encourage spontaneous speaking\n- fit the learner's profile\n- be neither childish nor academic\n- ideally create opportunities to observe the current focus topic indirectly\n\nReturn:\n{\n  \"topic_title\": \"string\",\n  \"prompt_text\": \"string\",\n  \"optional_followups\": [\"string\"],\n  \"targeted_observation_opportunities\": [\"string\"]\n}",
+      "max_output_tokens": 500,
+      "user_prompt_template": "Learner profile:\n{{learner_profile_json}}\n\nCurrent focus topic if any:\n{{focus_topic_json}}\n\nRecent topics already used:\n{{recent_topics_json}}",
+      "expected_output_schema_json": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "577c2d97-77df-46ef-b62d-1d2dd2b3c1b2",
+      "name": "Daily Prompt Generator",
+      "model": "gpt-4.1-mini",
+      "version": 3,
+      "category": "daily",
+      "metadata": {
+        "note": "no_reachable_ui_caller_yet",
+        "fixed_at": "2026-08-15T21:18:33.602496",
+        "fix_reason": "befund_l_variable_and_schema_mismatch",
+        "supersedes_version": 2
+      },
+      "is_active": true,
+      "created_at": "2026-08-15T21:18:33.602496+00:00",
+      "created_by": null,
+      "prompt_key": "daily_prompt_generator",
+      "updated_at": "2026-08-15T21:18:33.602496+00:00",
+      "updated_by": null,
+      "description": "Erzeugt einen täglichen Sprechimpuls. v3: Variablennamen und Ausgabeformat auf DailyPromptOutput (daily-prompt.service.ts) ausgerichtet (Befund L). Hinweis: aktuell ruft keine UI dailyPromptService auf -- Inhalt korrigiert für Konsistenz, Aktivierung ist ein separater Schritt.",
+      "system_prompt": "You are a conversation prompt generator for adult German learners living in Germany.\nGenerate one natural, motivating speaking prompt for a daily speaking session.\nReturn valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "The prompt should feel realistic, encourage spontaneous speaking, fit the learner's level, be neither childish nor academic, and ideally create opportunities to observe the current focus topic indirectly.\n\nReturn exactly this JSON shape:\n{\n  \"title\": \"string, short topic title\",\n  \"prompt_text\": \"string, the actual speaking prompt for the learner\",\n  \"rationale\": \"string, one sentence on why this prompt fits the learner right now\",\n  \"difficulty\": \"string, a level label matching the learner's German level\"\n}",
+      "max_output_tokens": 500,
+      "user_prompt_template": "Current focus topic: {{focus_topic_title}}\nLearner's German level: {{german_level}}\nRecent signal: {{recent_signal}}",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "title",
+          "prompt_text",
+          "rationale",
+          "difficulty"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          },
+          "difficulty": {
+            "type": "string",
+            "minLength": 1
+          },
+          "prompt_text": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": [
+        {
+          "key": "focus_topic_title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "german_level",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "recent_signal",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "27b1577e-a786-4b13-b077-ffb0ca9f8015",
+      "name": "Dashboard Summary",
+      "model": "gpt-4.1-mini",
+      "version": 1,
+      "category": "dashboard",
+      "metadata": {
+        "flow": "dashboard_data_pipeline",
+        "prompt_id": "dashboard_summary_v1",
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13"
+      },
+      "is_active": false,
+      "created_at": "2026-04-22T15:59:58.801504+00:00",
+      "created_by": null,
+      "prompt_key": "dashboard_summary",
+      "updated_at": "2026-05-13T15:17:06.199423+00:00",
+      "updated_by": null,
+      "description": "",
+      "system_prompt": "Du bist ein Lernfortschritt-Assistent und antwortest ausschließlich als valides JSON.",
+      "response_format": "json_object",
+      "developer_prompt": "Fasse den aktuellen Dashboard-Stand positiv, präzise und datenbasiert zusammen. Keine zusätzlichen Felder ausgeben.",
+      "max_output_tokens": 450,
+      "user_prompt_template": "Dashboard-Daten (JSON): {{dashboard_payload_json}}. Gib summary, next_action und confidence_note zurück.",
+      "expected_output_schema_json": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "397ba456-d9a3-48c2-a570-a8a2d93c033d",
+      "name": "Dashboard Summary",
+      "model": "gpt-4.1-mini",
+      "version": 2,
+      "category": "dashboard",
+      "metadata": {
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13"
+      },
+      "is_active": false,
+      "created_at": "2026-04-23T08:16:42.035733+00:00",
+      "created_by": null,
+      "prompt_key": "dashboard_summary",
+      "updated_at": "2026-05-13T15:17:06.199423+00:00",
+      "updated_by": null,
+      "description": "",
+      "system_prompt": "You are a progress summarizer for a German speaking improvement app.\nWrite short, motivating, honest summaries of learner progress.\nReturn valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "Be encouraging but accurate.\nDo not exaggerate progress.\nMention strengths, current focus, and the next useful step.\n\nReturn:\n{\n  \"headline\": \"string\",\n  \"summary_text\": \"string\",\n  \"current_strength\": \"string\",\n  \"current_focus\": \"string\",\n  \"next_step\": \"string\"\n}",
+      "max_output_tokens": 450,
+      "user_prompt_template": "Learner progress data:\n{{learner_progress_json}}",
+      "expected_output_schema_json": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "549be2f1-59dc-4680-9234-dfef09f6d906",
+      "name": "Dashboard Summary",
+      "model": "gpt-4.1-mini",
+      "version": 3,
+      "category": "dashboard",
+      "metadata": {
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13"
+      },
+      "is_active": false,
+      "created_at": "2026-04-23T09:14:06.111697+00:00",
+      "created_by": null,
+      "prompt_key": "dashboard_summary",
+      "updated_at": "2026-05-13T15:17:06.199423+00:00",
+      "updated_by": null,
+      "description": "",
+      "system_prompt": "You are a progress summarizer for a German speaking improvement app.\nWrite short, motivating, honest summaries of learner progress.\nReturn valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "Be encouraging but accurate.\nDo not exaggerate progress.\nMention strengths, current focus, and the next useful step.\n\nReturn:\n{\n  \"headline\": \"string\",\n  \"summary_text\": \"string\",\n  \"current_strength\": \"string\",\n  \"current_focus\": \"string\",\n  \"next_step\": \"string\"\n}",
+      "max_output_tokens": 450,
+      "user_prompt_template": "Learner progress data:\n{{learner_progress_json}}\nDashboard-Daten (JSON): {{dashboard_payload_json}}. Gib summary, next_action und confidence_note zurück.",
+      "expected_output_schema_json": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "e2f29eb1-9329-4477-8930-c755e9b3546d",
+      "name": "Dashboard Summary",
+      "model": "gpt-4.1-mini",
+      "version": 4,
+      "category": "dashboard",
+      "metadata": {
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13"
+      },
+      "is_active": false,
+      "created_at": "2026-04-23T09:14:37.458356+00:00",
+      "created_by": null,
+      "prompt_key": "dashboard_summary",
+      "updated_at": "2026-08-15T20:55:37.590693+00:00",
+      "updated_by": null,
+      "description": "",
+      "system_prompt": "You are a progress summarizer for a German speaking improvement app.\nWrite short, motivating, honest summaries of learner progress.\nReturn valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "Be encouraging but accurate.\nDo not exaggerate progress.\nMention strengths, current focus, and the next useful step.\n\nReturn:\n{\n  \"headline\": \"string\",\n  \"summary_text\": \"string\",\n  \"current_strength\": \"string\",\n  \"current_focus\": \"string\",\n  \"next_step\": \"string\"\n}",
+      "max_output_tokens": 450,
+      "user_prompt_template": "Dashboard-Daten (JSON): {{dashboard_payload_json}}. Gib summary, next_action und confidence_note zurück.",
+      "expected_output_schema_json": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "a7dedbef-58c9-4912-b112-3d044a48f986",
+      "name": "Dashboard Summary",
+      "model": "gpt-4.1-mini",
+      "version": 5,
+      "category": "dashboard",
+      "metadata": {
+        "fixed_at": "2026-08-15T20:55:37.590693",
+        "fix_reason": "befund_i_self_contradictory_output_contract",
+        "supersedes_version": 4
+      },
+      "is_active": true,
+      "created_at": "2026-08-15T20:55:37.590693+00:00",
+      "created_by": null,
+      "prompt_key": "dashboard_summary",
+      "updated_at": "2026-08-15T20:55:37.590693+00:00",
+      "updated_by": null,
+      "description": "Fasst den Lernfortschritt fürs Dashboard zusammen. v5: developer_prompt, user_prompt_template und expected_output_schema_json widersprachen sich (drei verschiedene Feldsätze) und stimmten mit keinem davon vollständig mit dem tatsächlich konsumierten DashboardSummaryOutput-Typ überein. Jetzt auf einen Vertrag vereinheitlicht (Befund I, Launch-Readiness-Audit 2026-08-15).",
+      "system_prompt": "You are a progress summarizer for a German speaking improvement app.\nWrite short, motivating, honest summaries of learner progress.\nReturn valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "Be encouraging but accurate.\nDo not exaggerate progress.\nMention strengths, current focus, and the next useful step.\nNever invent data that is not supported by the dashboard payload -- use null for fields you cannot support with evidence.\n\nReturn exactly this JSON shape:\n{\n  \"summary\": \"string, 1-2 sentences, the main takeaway\",\n  \"next_action\": \"string, one concrete next step in plain language\",\n  \"confidence_note\": \"string, one sentence on how confident this assessment is and why\",\n  \"primaryImprovementArea\": null, or an object with \"skill\" (string), \"title\" (string), \"reason\" (string), \"confidence\" (\"low\", \"medium\", or \"high\"),\n  \"nextAction\": null, or an object with \"title\" (string), \"description\" (string), \"targetSkill\" (string), \"recommendedTrainingId\" (string or null), \"reason\" (string),\n  \"focusTopic\": null, or an object with \"title\" (string), \"reason\" (string)\n}\n\nsummary, next_action and confidence_note are always required plain-text fields -- never omit them even when the richer objects are null. primaryImprovementArea, nextAction and focusTopic are optional richer objects: include them only when the dashboard payload gives you enough signal, otherwise set them to null explicitly rather than guessing.",
+      "max_output_tokens": 450,
+      "user_prompt_template": "Dashboard-Daten (JSON): {{dashboard_payload_json}}\n\nGib summary, next_action und confidence_note zurück (immer erforderlich). Ergänze primaryImprovementArea, nextAction und focusTopic nur, wenn die Daten das hergeben -- sonst null.",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "summary",
+          "next_action",
+          "confidence_note",
+          "primaryImprovementArea",
+          "nextAction",
+          "focusTopic"
+        ],
+        "properties": {
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "focusTopic": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "title",
+                  "reason"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+          },
+          "nextAction": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "title",
+                  "description",
+                  "targetSkill",
+                  "recommendedTrainingId",
+                  "reason"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "targetSkill": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "recommendedTrainingId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+          },
+          "next_action": {
+            "type": "string",
+            "minLength": 1
+          },
+          "confidence_note": {
+            "type": "string",
+            "minLength": 1
+          },
+          "primaryImprovementArea": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "skill",
+                  "title",
+                  "reason",
+                  "confidence"
+                ],
+                "properties": {
+                  "skill": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "confidence": {
+                    "enum": [
+                      "low",
+                      "medium",
+                      "high"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": [
+        {
+          "key": "dashboard_payload_json",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "a7425c33-8909-4dc5-afc1-5b82c3b65c89",
+      "name": "Focus Topic Extraction",
+      "model": "gpt-4.1-mini",
+      "version": 1,
+      "category": "focus",
+      "metadata": {
+        "deactivated_reason": "not_referenced_by_current_runtime_code",
+        "deactivated_source": "code_runtime_prompt_audit_2026_05_13"
+      },
+      "is_active": false,
+      "created_at": "2026-04-22T11:18:23.88676+00:00",
+      "created_by": null,
+      "prompt_key": "focus_topic_extraction",
+      "updated_at": "2026-05-13T15:17:06.199423+00:00",
+      "updated_by": null,
+      "description": "",
+      "system_prompt": "Du extrahierst Lernfokusthemen aus Analysen. Antworte nur als valides JSON.",
+      "response_format": "json_object",
+      "developer_prompt": "Erzeuge topic_key, title, priority, confidence und reasoning pro Eintrag.",
+      "max_output_tokens": 800,
+      "user_prompt_template": "Input-Analyse: {{analysis_json}}. Maximal {{max_topics}} Themen extrahieren.",
+      "expected_output_schema_json": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "0360b56e-4e8a-42fe-b255-667422e1b516",
+      "name": "Focus Topic Selector",
+      "model": "gpt-4.1-mini",
+      "version": 1,
+      "category": "focus",
+      "metadata": {
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13"
+      },
+      "is_active": false,
+      "created_at": "2026-04-23T08:25:23.46572+00:00",
+      "created_by": null,
+      "prompt_key": "focus_topic_selector",
+      "updated_at": "2026-08-15T20:53:30.804379+00:00",
+      "updated_by": null,
+      "description": "",
+      "system_prompt": "You are a pedagogical decision engine for a German speaking coach app. Choose exactly one focus topic for the next intervention. Return valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "Choose one and only one focus topic.\n\nSelection criteria:\n- recurring pattern\n- high communicative value\n- learner readiness\n- not too broad\n- explainable in a short dialog\n- measurable in future spontaneous speech\n\nAvoid:\n- selecting multiple topics\n- choosing vague goals\n- choosing issues with weak evidence\n\nReturn:\n{\n  \"focus_topic\": {\n    \"pattern_key\": \"string\",\n    \"label\": \"string\",\n    \"category\": \"string\",\n    \"why_now\": \"string\",\n    \"what_success_looks_like\": \"string\",\n    \"things_to_watch_in_future_sessions\": [\"string\"]\n  }\n}",
+      "max_output_tokens": 900,
+      "user_prompt_template": "Stable learner patterns:\n{{stable_patterns_json}}\n\nLatest session analysis:\n{{latest_session_analysis_json}}",
+      "expected_output_schema_json": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "65ca4a7b-b8ae-419b-9dfa-b1858f90a920",
+      "name": "Focus Topic Selector",
+      "model": "gpt-4.1-mini",
+      "version": 2,
+      "category": "focus",
+      "metadata": {
+        "fixed_at": "2026-08-15T20:53:30.804379",
+        "fix_reason": "befund_l_variable_and_schema_mismatch",
+        "supersedes_version": 1
+      },
+      "is_active": true,
+      "created_at": "2026-08-15T20:53:30.804379+00:00",
+      "created_by": null,
+      "prompt_key": "focus_topic_selector",
+      "updated_at": "2026-08-15T20:53:30.804379+00:00",
+      "updated_by": null,
+      "description": "Wählt genau ein Fokus-Thema aus stabilen Lernmustern. v2: Variablennamen und Ausgabeformat auf parseFocusTopicSelectorOutput ausgerichtet (Befund L, Launch-Readiness-Audit 2026-08-15).",
+      "system_prompt": "You are a pedagogical decision engine for a German speaking coach app. Choose exactly one focus topic for the next intervention. Return valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "Choose one and only one focus topic.\n\nSelection criteria:\n- recurring pattern\n- high communicative value\n- learner readiness\n- not too broad\n- explainable in a short dialog\n- measurable in future spontaneous speech\n\nAvoid:\n- selecting multiple topics\n- choosing vague goals\n- choosing issues with weak evidence\n\nDecide selection_status first: \"selected\" only if the evidence clearly supports one focus topic, otherwise \"insufficient_evidence\".\n\nReturn exactly this JSON shape:\n{\n  \"selection_status\": \"selected\" or \"insufficient_evidence\",\n  \"reason\": \"string, 1-2 sentences explaining the decision\",\n  \"evidence_summary\": {\n    \"sessions_analyzed\": integer,\n    \"strongest_pattern_key\": \"string or null\",\n    \"recurrence\": \"0.0-1.0\",\n    \"confidence\": \"0.0-1.0\",\n    \"communicative_impact\": \"low, medium, high, or null\",\n    \"learner_readiness\": \"0.0-1.0\"\n  },\n  \"focus_topic\": null when selection_status is \"insufficient_evidence\", otherwise an object with:\n    \"topic_key\": \"string, stable machine-readable key, never the literal insufficient_evidence\",\n    \"label\": \"string, short human-readable name\",\n    \"short_explanation\": \"string, 1-2 sentences\",\n    \"reason\": \"string, why this topic now\",\n    \"source_pattern_key\": \"string, must match a pattern_key from the stable learner patterns input\"\n}\n\nevidence_summary is always required. When selection_status is \"insufficient_evidence\", focus_topic MUST be null, never an object.",
+      "max_output_tokens": 900,
+      "user_prompt_template": "Stable learner patterns:\n{{stable_patterns_json}}\n\nNumber of sessions analyzed: {{session_count}}\nMinimum sessions required for diagnosis: {{min_sessions_for_diagnosis}}",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "selection_status",
+          "reason",
+          "evidence_summary",
+          "focus_topic"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "focus_topic": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "topic_key",
+                  "label",
+                  "short_explanation",
+                  "reason",
+                  "source_pattern_key"
+                ],
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "topic_key": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "short_explanation": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "source_pattern_key": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+          },
+          "evidence_summary": {
+            "type": "object",
+            "required": [
+              "sessions_analyzed",
+              "strongest_pattern_key",
+              "recurrence",
+              "confidence",
+              "communicative_impact",
+              "learner_readiness"
+            ],
+            "properties": {
+              "confidence": {
+                "type": "number",
+                "maximum": 1,
+                "minimum": 0
+              },
+              "recurrence": {
+                "type": "number",
+                "maximum": 1,
+                "minimum": 0
+              },
+              "learner_readiness": {
+                "type": "number",
+                "maximum": 1,
+                "minimum": 0
+              },
+              "sessions_analyzed": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "communicative_impact": {
+                "enum": [
+                  "low",
+                  "medium",
+                  "high",
+                  null
+                ],
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "strongest_pattern_key": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "selection_status": {
+            "enum": [
+              "selected",
+              "insufficient_evidence"
+            ],
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": [
+        {
+          "key": "stable_patterns_json",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "session_count",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "min_sessions_for_diagnosis",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "c1b51913-ee3b-438c-8f7a-05dd2e6db6bf",
+      "name": "Improvement Check",
+      "model": "gpt-4.1-mini",
+      "version": 1,
+      "category": "improvement",
+      "metadata": {
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13"
+      },
+      "is_active": false,
+      "created_at": "2026-04-23T08:25:23.46572+00:00",
+      "created_by": null,
+      "prompt_key": "improvement_check",
+      "updated_at": "2026-08-15T21:18:33.602496+00:00",
+      "updated_by": null,
+      "description": "",
+      "system_prompt": "You are a progress evaluator for a German conversation coaching app. Measure whether the learner has improved in one previously trained focus topic. Return valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "Compare baseline evidence before the intervention with newer spontaneous speech.\nFocus only on the trained topic.\nBe conservative and evidence-based.\n\nReturn:\n{\n  \"focus_topic_label\": \"string\",\n  \"improvement_status\": \"improved|unchanged|worse|insufficient_data\",\n  \"confidence\": 0.0,\n  \"evidence_before\": [\"string\"],\n  \"evidence_after\": [\"string\"],\n  \"summary\": \"string\",\n  \"should_continue_training\": true\n}",
+      "max_output_tokens": 900,
+      "user_prompt_template": "Focus topic:\n{{focus_topic_json}}\n\nBaseline evidence:\n{{baseline_evidence_json}}\n\nRecent post-training sessions:\n{{recent_sessions_json}}",
+      "expected_output_schema_json": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "b95f6e70-b699-43cb-9cb2-2ff67c67976d",
+      "name": "Improvement Check",
+      "model": "gpt-4.1-mini",
+      "version": 2,
+      "category": "improvement",
+      "metadata": {
+        "fixed_at": "2026-08-15T21:18:33.602496",
+        "fix_reason": "befund_l_variable_and_schema_mismatch",
+        "supersedes_version": 1
+      },
+      "is_active": true,
+      "created_at": "2026-08-15T21:18:33.602496+00:00",
+      "created_by": null,
+      "prompt_key": "improvement_check",
+      "updated_at": "2026-08-15T21:18:33.602496+00:00",
+      "updated_by": null,
+      "description": "Prüft, ob sich ein Lernender im aktiven Fokus-Thema verbessert hat. v2: Variablennamen und Ausgabeformat auf parseImprovementCheckPromptOutput ausgerichtet (Befund L).",
+      "system_prompt": "You are a progress evaluator for a German conversation coaching app. Measure whether the learner has improved in one previously trained focus topic. Return valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "Compare baseline evidence before the intervention with newer spontaneous speech.\nFocus only on the trained topic. Be conservative and evidence-based. Default to \"insufficient_data\" if the recent sessions do not contain enough evidence about the focus topic.\n\nReturn exactly this JSON shape:\n{\n  \"decision\": \"improved\", \"unchanged\", \"worsened\", or \"insufficient_data\",\n  \"confidence\": \"0.0-1.0\",\n  \"rationale\": \"string, 1-2 sentences explaining the decision\",\n  \"focus_evidence\": \"string, what evidence about the focus topic you found\",\n  \"baseline_evidence\": [\"short quote or paraphrase from the baseline\", \"...\"],\n  \"current_evidence\": [\"short quote or paraphrase from the recent sessions\", \"...\"],\n  \"focus_topic_key\": \"string, must match the current focus topic key\",\n  \"focus_topic_key_match\": true or false, whether the evidence you found is actually about this focus topic key,\n  \"focus_topic_match\": true or false, same check at a coarser level,\n  \"evidence_quality\": \"low\", \"medium\", or \"high\" (optional, omit entirely if unsure),\n  \"recommendation\": \"string, one concrete next step\"\n}",
+      "max_output_tokens": 900,
+      "user_prompt_template": "Current focus topic key: {{current_focus_topic_key}}\nFocus topic title: {{focus_topic_title}}\nFocus pattern type: {{focus_pattern_type}}\n\nBaseline evidence (before training):\n{{baseline_json}}\n\nRecent post-training sessions ({{recent_session_count}} total):\n{{recent_sessions_json}}",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "decision",
+          "confidence",
+          "rationale",
+          "focus_evidence",
+          "baseline_evidence",
+          "current_evidence",
+          "focus_topic_key",
+          "focus_topic_key_match",
+          "focus_topic_match",
+          "recommendation"
+        ],
+        "properties": {
+          "decision": {
+            "enum": [
+              "improved",
+              "unchanged",
+              "worsened",
+              "insufficient_data"
+            ],
+            "type": "string"
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          },
+          "confidence": {
+            "type": "number",
+            "maximum": 1,
+            "minimum": 0
+          },
+          "focus_evidence": {
+            "type": "string",
+            "minLength": 1
+          },
+          "recommendation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "focus_topic_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "current_evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidence_quality": {
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "type": "string"
+          },
+          "baseline_evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "focus_topic_match": {
+            "type": "boolean"
+          },
+          "focus_topic_key_match": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": [
+        {
+          "key": "current_focus_topic_key",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "focus_topic_title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "focus_pattern_type",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "baseline_json",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "recent_sessions_json",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "recent_session_count",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "12f09ac0-76ac-403a-8cd8-333c493e94cb",
+      "name": "Json Repair",
+      "model": "gpt-4.1-mini",
+      "version": 1,
+      "category": "json",
+      "metadata": {
+        "flow": "prompt_execution_error_path",
+        "prompt_id": "json_repair_v1",
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13"
+      },
+      "is_active": true,
+      "created_at": "2026-04-22T16:00:23.673247+00:00",
+      "created_by": null,
+      "prompt_key": "json_repair",
+      "updated_at": "2026-05-13T15:17:06.199423+00:00",
+      "updated_by": null,
+      "description": "",
+      "system_prompt": "Du bist ein JSON-Reparatur-Assistent und antwortest ausschließlich als valides JSON.",
+      "response_format": "json_object",
+      "developer_prompt": "Repariere kaputtes JSON minimal-invasiv, beachte strikt das Ziel-Schema und erfinde keine neuen Inhalte.",
+      "max_output_tokens": 900,
+      "user_prompt_template": "Fehlerhinweis: {{repair_error_hint}}. Defekter Text: {{invalid_json_text}}. Ziel-Schema (JSON): {{target_schema_json}}. Gib repaired_json zurück.",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "repaired_json"
+        ],
+        "properties": {
+          "repaired_json": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "e2a8a591-ffe8-40b6-8142-f565beaf4286",
+      "name": "Multi Session Pattern Detection",
+      "model": "gpt-4.1-mini",
+      "version": 1,
+      "category": "multi",
+      "metadata": {
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13"
+      },
+      "is_active": false,
+      "created_at": "2026-04-23T08:25:23.46572+00:00",
+      "created_by": null,
+      "prompt_key": "multi_session_pattern_detection",
+      "updated_at": "2026-08-15T20:53:30.804379+00:00",
+      "updated_by": null,
+      "description": "",
+      "system_prompt": "You are a longitudinal language learning analyst for spoken German development. Your task is to identify stable recurring learner patterns across multiple sessions. Return valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "You will receive multiple analyzed learner sessions.\nIdentify only patterns that appear stable enough to matter instructionally.\n\nRules:\n- prefer recurring patterns over isolated mistakes\n- consider frequency, consistency, and communicative impact\n- highlight improvement, stagnation, or regression\n- recommend only one primary focus topic at a time\n\nReturn:\n{\n  \"stable_patterns\": [\n    {\n      \"pattern_key\": \"string\",\n      \"label\": \"string\",\n      \"category\": \"string\",\n      \"supporting_sessions\": [\"session_id\"],\n      \"trend\": \"improving|stable|worsening|mixed\",\n      \"instructional_priority\": \"low|medium|high\",\n      \"reason\": \"string\"\n    }\n  ],\n  \"recommended_focus_topic\": {\n    \"pattern_key\": \"string\",\n    \"label\": \"string\",\n    \"category\": \"string\",\n    \"reason\": \"string\"\n  },\n  \"overall_trend_summary\": \"string\"\n}",
+      "max_output_tokens": 1200,
+      "user_prompt_template": "Learner profile:\n{{learner_profile_json}}\n\nRecent session analyses:\n{{recent_session_analyses_json}}",
+      "expected_output_schema_json": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "0cb5972c-b901-4521-9518-eacae5f6422f",
+      "name": "Multi Session Pattern Detection",
+      "model": "gpt-4.1-mini",
+      "version": 2,
+      "category": "multi",
+      "metadata": {
+        "fixed_at": "2026-08-15T20:53:30.804379",
+        "fix_reason": "befund_l_variable_and_schema_mismatch",
+        "supersedes_version": 1
+      },
+      "is_active": false,
+      "created_at": "2026-08-15T20:53:30.804379+00:00",
+      "created_by": null,
+      "prompt_key": "multi_session_pattern_detection",
+      "updated_at": "2026-08-16T06:16:13.629919+00:00",
+      "updated_by": null,
+      "description": "Erkennt stabile Lernmuster über mehrere Sessions hinweg. v2: Variablennamen und Ausgabeformat auf parseMultiSessionPatternOutput ausgerichtet (Befund L, Launch-Readiness-Audit 2026-08-15).",
+      "system_prompt": "You are a longitudinal language learning analyst for spoken German development. Your task is to identify stable recurring learner patterns across multiple sessions. Return valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "You will receive multiple analyzed learner sessions, each with its own detected_patterns.\nIdentify only patterns that are stable enough across sessions to matter instructionally.\n\nRules:\n- prefer recurring patterns over isolated mistakes\n- reuse pattern_key values from the input sessions' detected_patterns where the same issue recurs; only introduce a new pattern_key if no existing one fits\n- consider frequency, consistency, and communicative impact\n- if there is not enough data to identify any stable pattern, set enough_data to false and return an empty stable_patterns array\n\nReturn exactly this JSON shape:\n{\n  \"enough_data\": true or false,\n  \"stable_patterns\": [\n    {\n      \"pattern_key\": \"string, matches or extends a pattern_key seen in the input\",\n      \"label\": \"string, short human-readable name\",\n      \"description\": \"string, what the pattern looks like in practice\",\n      \"recurrence\": \"0.0-1.0\",\n      \"confidence\": \"0.0-1.0\",\n      \"supporting_sessions\": [\"session_id\", \"...\"],\n      \"communicative_impact\": \"low, medium, or high\",\n      \"evidence\": [\"short quote or paraphrase from the transcripts\", \"...\"]\n    }\n  ]\n}\n\nAll fields are required for every entry in stable_patterns. If enough_data is false, stable_patterns must be an empty array, never omitted.",
+      "max_output_tokens": 1200,
+      "user_prompt_template": "Analyzed sessions ({{session_count}} total, minimum {{min_sessions_for_diagnosis}} required for diagnosis):\n{{session_analyses_json}}",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "enough_data",
+          "stable_patterns"
+        ],
+        "properties": {
+          "enough_data": {
+            "type": "boolean"
+          },
+          "stable_patterns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "pattern_key",
+                "label",
+                "description",
+                "recurrence",
+                "confidence",
+                "supporting_sessions",
+                "communicative_impact",
+                "evidence"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "confidence": {
+                  "type": "number",
+                  "maximum": 1,
+                  "minimum": 0
+                },
+                "recurrence": {
+                  "type": "number",
+                  "maximum": 1,
+                  "minimum": 0
+                },
+                "description": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pattern_key": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "supporting_sessions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "communicative_impact": {
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": [
+        {
+          "key": "session_analyses_json",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "session_count",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "min_sessions_for_diagnosis",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "3cee4446-e4c6-45a1-b6f6-841d0ddd13be",
+      "name": "Multi Session Pattern Detection",
+      "model": "gpt-4.1-mini",
+      "version": 3,
+      "category": "multi",
+      "metadata": {
+        "fix_reason": "befund_k_p0_3_performance_conditions",
+        "supersedes_version": 2
+      },
+      "is_active": true,
+      "created_at": "2026-08-16T06:16:13.629919+00:00",
+      "created_by": null,
+      "prompt_key": "multi_session_pattern_detection",
+      "updated_at": "2026-08-16T06:16:13.629919+00:00",
+      "updated_by": null,
+      "description": "Erkennt stabile Lernmuster über mehrere Sessions hinweg. v3: Performanzbedingungen (Sprechmodus, Spontaneität, Aufgabenkomplexität, Registerdruck) je Muster ergänzt (Launch-Readiness-Audit Befund K, P0 #3).",
+      "system_prompt": "You are a longitudinal language learning analyst for spoken German development. Your task is to identify stable recurring learner patterns across multiple sessions. Return valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "You will receive multiple analyzed learner sessions, each with its own detected_patterns.\nIdentify only patterns that are stable enough across sessions to matter instructionally.\n\nRules:\n- prefer recurring patterns over isolated mistakes\n- reuse pattern_key values from the input sessions' detected_patterns where the same issue recurs; only introduce a new pattern_key if no existing one fits\n- consider frequency, consistency, and communicative impact\n- if there is not enough data to identify any stable pattern, set enough_data to false and return an empty stable_patterns array\n\nPERFORMANCE CONDITIONS (REQUIRED, Launch-Readiness-Audit Befund K, P0 #3):\n\nFor every entry in stable_patterns, also assess performance_conditions -- the task/communication conditions under which the pattern was observed across the supporting_sessions:\n- speech_mode: \"dialog\" (interactive exchange), \"monolog\" (extended single-speaker turns), or \"mixed\" if both occur meaningfully across the supporting sessions\n- spontaneity: \"spontaneous\" (unplanned, real-time), \"prepared\" (rehearsed/read/pre-planned), or \"mixed\"\n- task_complexity: \"low\", \"medium\", or \"high\" -- how demanding the communicative task was (topic abstractness, vocabulary range required, structural demands)\n- register_pressure: \"low\", \"medium\", or \"high\" -- how much the situation demanded formal/careful register versus casual speech\n- consistent_condition_count: integer 0-4 -- count how many of the four dimensions above showed essentially the SAME value across all supporting_sessions (i.e. the pattern was not just observed once under one specific condition, but recurs under a stable combination of conditions). 0 means the conditions varied on every dimension; 4 means all four were consistent.\n\nDo not inflate consistent_condition_count -- if you only have one supporting session, or the sessions clearly differ in speech mode/spontaneity/complexity/register, count only what is genuinely consistent.\n\nReturn exactly this JSON shape:\n{\n  \"enough_data\": true or false,\n  \"stable_patterns\": [\n    {\n      \"pattern_key\": \"string, matches or extends a pattern_key seen in the input\",\n      \"label\": \"string, short human-readable name\",\n      \"description\": \"string, what the pattern looks like in practice\",\n      \"recurrence\": \"0.0-1.0\",\n      \"confidence\": \"0.0-1.0\",\n      \"supporting_sessions\": [\"session_id\", \"...\"],\n      \"communicative_impact\": \"low, medium, or high\",\n      \"evidence\": [\"short quote or paraphrase from the transcripts\", \"...\"],\n      \"performance_conditions\": {\n        \"speech_mode\": \"dialog, monolog, or mixed\",\n        \"spontaneity\": \"spontaneous, prepared, or mixed\",\n        \"task_complexity\": \"low, medium, or high\",\n        \"register_pressure\": \"low, medium, or high\",\n        \"consistent_condition_count\": \"integer 0-4\"\n      }\n    }\n  ]\n}\n\nAll fields are required for every entry in stable_patterns, including performance_conditions with all five of its sub-fields. If enough_data is false, stable_patterns must be an empty array, never omitted.",
+      "max_output_tokens": 1500,
+      "user_prompt_template": "Analyzed sessions ({{session_count}} total, minimum {{min_sessions_for_diagnosis}} required for diagnosis):\n{{session_analyses_json}}",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "enough_data",
+          "stable_patterns"
+        ],
+        "properties": {
+          "enough_data": {
+            "type": "boolean"
+          },
+          "stable_patterns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "pattern_key",
+                "label",
+                "description",
+                "recurrence",
+                "confidence",
+                "supporting_sessions",
+                "communicative_impact",
+                "evidence",
+                "performance_conditions"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "confidence": {
+                  "type": "number",
+                  "maximum": 1,
+                  "minimum": 0
+                },
+                "recurrence": {
+                  "type": "number",
+                  "maximum": 1,
+                  "minimum": 0
+                },
+                "description": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pattern_key": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "supporting_sessions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "communicative_impact": {
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "type": "string"
+                },
+                "performance_conditions": {
+                  "type": "object",
+                  "required": [
+                    "speech_mode",
+                    "spontaneity",
+                    "task_complexity",
+                    "register_pressure",
+                    "consistent_condition_count"
+                  ],
+                  "properties": {
+                    "speech_mode": {
+                      "enum": [
+                        "dialog",
+                        "monolog",
+                        "mixed"
+                      ],
+                      "type": "string"
+                    },
+                    "spontaneity": {
+                      "enum": [
+                        "spontaneous",
+                        "prepared",
+                        "mixed"
+                      ],
+                      "type": "string"
+                    },
+                    "task_complexity": {
+                      "enum": [
+                        "low",
+                        "medium",
+                        "high"
+                      ],
+                      "type": "string"
+                    },
+                    "register_pressure": {
+                      "enum": [
+                        "low",
+                        "medium",
+                        "high"
+                      ],
+                      "type": "string"
+                    },
+                    "consistent_condition_count": {
+                      "type": "integer",
+                      "maximum": 4,
+                      "minimum": 0
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": [
+        {
+          "key": "session_analyses_json",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "session_count",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "min_sessions_for_diagnosis",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "25be2cdc-5a9e-4d2f-a421-c87657e38245",
+      "name": "Session Analysis",
+      "model": "gpt-4.1-mini",
+      "version": 1,
+      "category": "session",
+      "metadata": {
+        "categories": [
+          "grammatical_accuracy",
+          "lexical_appropriateness",
+          "fluency",
+          "intelligibility",
+          "coherence_and_sentence_structure",
+          "register_and_naturalness",
+          "interactional_competence"
+        ],
+        "pipeline_step": "session_analysis_v1",
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13",
+        "seed_content_policy": "runtime_prompts_managed_via_admin_db_only",
+        "seed_content_neutralized": true,
+        "seed_content_neutralized_at": "2026-05-15T06:16:10.424797"
+      },
+      "is_active": false,
+      "created_at": "2026-04-22T12:23:52.326083+00:00",
+      "created_by": null,
+      "prompt_key": "session_analysis",
+      "updated_at": "2026-05-15T06:16:10.424797+00:00",
+      "updated_by": null,
+      "description": "",
+      "system_prompt": "",
+      "response_format": "json_object",
+      "developer_prompt": "",
+      "max_output_tokens": 1400,
+      "user_prompt_template": "",
+      "expected_output_schema_json": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "6eb89767-7e00-4e4c-b7ae-6b77615e6767",
+      "name": "Session Analysis",
+      "model": "gpt-5-mini",
+      "version": 2,
+      "category": "session",
+      "metadata": {
+        "pipeline_step": "session_analysis",
+        "schema_version": "2.0.0",
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13",
+        "seed_content_policy": "runtime_prompts_managed_via_admin_db_only",
+        "seed_content_neutralized": true,
+        "seed_content_neutralized_at": "2026-05-15T06:16:10.424797"
+      },
+      "is_active": false,
+      "created_at": "2026-04-22T14:53:42.081698+00:00",
+      "created_by": null,
+      "prompt_key": "session_analysis",
+      "updated_at": "2026-05-15T06:16:10.424797+00:00",
+      "updated_by": "0d4a7531-2344-432d-8283-c5b5a671c4dd",
+      "description": "",
+      "system_prompt": "",
+      "response_format": "json_object",
+      "developer_prompt": "",
+      "max_output_tokens": 1400,
+      "user_prompt_template": "",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "category_scores",
+          "detected_patterns",
+          "priority_intervention",
+          "session_summary"
+        ],
+        "properties": {
+          "category_scores": {
+            "type": "object",
+            "required": [
+              "grammatical_accuracy",
+              "lexical_appropriateness",
+              "fluency",
+              "intelligibility",
+              "coherence_and_sentence_structure",
+              "register_and_naturalness",
+              "interactional_competence"
+            ],
+            "properties": {
+              "fluency": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "intelligibility": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "grammatical_accuracy": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "lexical_appropriateness": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "interactional_competence": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "register_and_naturalness": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "coherence_and_sentence_structure": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "session_summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "detected_patterns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "pattern_key",
+                "label",
+                "description",
+                "frequency_estimate",
+                "communicative_impact",
+                "category"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "category": {
+                  "enum": [
+                    "grammatical_accuracy",
+                    "lexical_appropriateness",
+                    "fluency",
+                    "intelligibility",
+                    "coherence_and_sentence_structure",
+                    "register_and_naturalness",
+                    "interactional_competence"
+                  ],
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pattern_key": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "frequency_estimate": {
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "type": "string"
+                },
+                "communicative_impact": {
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "default": []
+          },
+          "priority_intervention": {
+            "type": "object",
+            "required": [
+              "pattern_key",
+              "label",
+              "reason"
+            ],
+            "properties": {
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "pattern_key": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "dbc021f9-241b-4e09-96dc-eebf8488b68d",
+      "name": "Session Analysis",
+      "model": "gpt-5-mini",
+      "version": 3,
+      "category": "session",
+      "metadata": {
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13"
+      },
+      "is_active": false,
+      "created_at": "2026-04-26T08:14:11.669741+00:00",
+      "created_by": "0d4a7531-2344-432d-8283-c5b5a671c4dd",
+      "prompt_key": "session_analysis",
+      "updated_at": "2026-05-13T15:17:06.199423+00:00",
+      "updated_by": "0d4a7531-2344-432d-8283-c5b5a671c4dd",
+      "description": "Output Token erhört",
+      "system_prompt": "You are an expert German-as-a-foreign-language evaluator.\nYou assess spoken German from adult learners living in Germany who already have everyday functional German.\nYou must evaluate the learner fairly, constructively, and precisely.\nDo not shame the learner. Do not overstate mistakes. Focus on recurring patterns and communicative impact.\nReturn valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "Nutze das Zielmodell gpt-5-mini. Analysiere genau eine Session und gib ausschließlich ein einziges JSON-Objekt zurück. Keine alternativen Antwortformen (kein Markdown, kein Freitext außerhalb des JSON, keine Erklärblöcke). Verwende exakt die vorgegebenen Schlüssel und Wertebereiche.",
+      "max_output_tokens": 3000,
+      "user_prompt_template": "Transkript (bereinigt): {{cleaned_transcript}}\\nSprache: {{language_code}}\\nAufgabe: Erstelle eine Session-Analyse mit category_scores, detected_patterns, priority_intervention und session_summary exakt gemäß Ausgabeschema.",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "category_scores",
+          "detected_patterns",
+          "priority_intervention",
+          "session_summary"
+        ],
+        "properties": {
+          "category_scores": {
+            "type": "object",
+            "required": [
+              "grammatical_accuracy",
+              "lexical_appropriateness",
+              "fluency",
+              "intelligibility",
+              "coherence_and_sentence_structure",
+              "register_and_naturalness",
+              "interactional_competence"
+            ],
+            "properties": {
+              "fluency": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "intelligibility": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "grammatical_accuracy": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "lexical_appropriateness": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "interactional_competence": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "register_and_naturalness": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "coherence_and_sentence_structure": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "session_summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "detected_patterns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "pattern_key",
+                "label",
+                "description",
+                "frequency_estimate",
+                "communicative_impact",
+                "category"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "category": {
+                  "enum": [
+                    "grammatical_accuracy",
+                    "lexical_appropriateness",
+                    "fluency",
+                    "intelligibility",
+                    "coherence_and_sentence_structure",
+                    "register_and_naturalness",
+                    "interactional_competence"
+                  ],
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pattern_key": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "frequency_estimate": {
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "type": "string"
+                },
+                "communicative_impact": {
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "default": []
+          },
+          "priority_intervention": {
+            "type": "object",
+            "required": [
+              "pattern_key",
+              "label",
+              "reason"
+            ],
+            "properties": {
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "pattern_key": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": [
+        {
+          "name": "cleaned_transcript",
+          "type": "string",
+          "required": true,
+          "description": "",
+          "defaultValue": ""
+        },
+        {
+          "name": "language_code",
+          "type": "string",
+          "required": true,
+          "description": "",
+          "defaultValue": ""
+        }
+      ]
+    },
+    {
+      "id": "ce5af7eb-3fa8-40a5-8533-d105ca3d4134",
+      "name": "Session Analysis",
+      "model": "gpt-5-mini",
+      "version": 4,
+      "category": "session",
+      "metadata": {
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13"
+      },
+      "is_active": false,
+      "created_at": "2026-05-02T07:11:46.333172+00:00",
+      "created_by": "0d4a7531-2344-432d-8283-c5b5a671c4dd",
+      "prompt_key": "session_analysis",
+      "updated_at": "2026-08-16T06:11:35.731537+00:00",
+      "updated_by": "0d4a7531-2344-432d-8283-c5b5a671c4dd",
+      "description": "developer promt und system promt erweitert wegen justification problem",
+      "system_prompt": "You are an expert German-as-a-foreign-language evaluator.\nYou assess spoken German from adult learners living in Germany who already have everyday functional German.\nYou must evaluate the learner fairly, constructively, and precisely.\nDo not shame the learner. Do not overstate mistakes. Focus on recurring patterns and communicative impact. Return valid JSON only. All required fields must be present and non-empty according to the schema.",
+      "response_format": "json_object",
+      "developer_prompt": "Nutze das Zielmodell gpt-5-mini. Analysiere genau eine Session und gib ausschließlich ein einziges JSON-Objekt zurück. Keine alternativen Antwortformen (kein Markdown, kein Freitext außerhalb des JSON, keine Erklärblöcke). Verwende exakt die vorgegebenen Schlüssel und Wertebereiche.\n\nWICHTIG FÜR category_scores:\n\nFür jede Kategorie (z. B. grammatical_accuracy, lexical_appropriateness usw.) musst du ein Objekt mit score, confidence, justification und evidence erzeugen.\n\nRegeln:\n\n1. score, confidence und justification müssen inhaltlich konsistent sein und aus derselben Bewertung entstehen.\n\n2. justification ist PFLICHT und muss:\n- ein nicht-leerer String sein\n- mindestens ein vollständiger deutscher Satz sein\n- darf niemals \"\", null oder nur Leerzeichen sein\n- muss den vergebenen score direkt erklären\n\n3. Inhalt der justification:\n- beschreibe typische sprachliche Muster (keine Einzelfehler)\n- bewerte das sprachliche Niveau (z. B. „überwiegend korrekt“, „eingeschränkt“, „unsicher“)\n- erkläre den kommunikativen Effekt (z. B. Verständlichkeit, Präzision)\n\n4. Auch wenn keine explizite evidence vorhanden ist:\n- justification muss trotzdem sinnvoll und fachlich begründet sein\n\n5. confidence:\n- gibt an, wie sicher die Bewertung auf Basis des Transkripts ist\n- niedriger bei wenig Daten oder uneindeutigen Mustern\n\n6. evidence:\n- optionale Beispiele aus dem Transkript\n- darf leer sein, justification aber niemals\n\nWICHTIG:\nWenn justification leer ist oder den Score nicht plausibel erklärt, ist die Antwort ungültig.",
+      "max_output_tokens": 3000,
+      "user_prompt_template": "Transkript (bereinigt): {{cleaned_transcript}}\\nSprache: {{language_code}}\\nAufgabe: Erstelle eine Session-Analyse mit category_scores, detected_patterns, priority_intervention und session_summary exakt gemäß Ausgabeschema.",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "category_scores",
+          "detected_patterns",
+          "priority_intervention",
+          "session_summary"
+        ],
+        "properties": {
+          "category_scores": {
+            "type": "object",
+            "required": [
+              "grammatical_accuracy",
+              "lexical_appropriateness",
+              "fluency",
+              "intelligibility",
+              "coherence_and_sentence_structure",
+              "register_and_naturalness",
+              "interactional_competence"
+            ],
+            "properties": {
+              "fluency": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "intelligibility": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "grammatical_accuracy": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "lexical_appropriateness": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "interactional_competence": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "register_and_naturalness": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "coherence_and_sentence_structure": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "session_summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "detected_patterns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "pattern_key",
+                "label",
+                "description",
+                "frequency_estimate",
+                "communicative_impact",
+                "category"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "category": {
+                  "enum": [
+                    "grammatical_accuracy",
+                    "lexical_appropriateness",
+                    "fluency",
+                    "intelligibility",
+                    "coherence_and_sentence_structure",
+                    "register_and_naturalness",
+                    "interactional_competence"
+                  ],
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pattern_key": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "frequency_estimate": {
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "type": "string"
+                },
+                "communicative_impact": {
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "default": []
+          },
+          "priority_intervention": {
+            "type": "object",
+            "required": [
+              "pattern_key",
+              "label",
+              "reason"
+            ],
+            "properties": {
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "pattern_key": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": [
+        {
+          "name": "cleaned_transcript",
+          "type": "string",
+          "required": true,
+          "description": "",
+          "defaultValue": ""
+        },
+        {
+          "name": "language_code",
+          "type": "string",
+          "required": true,
+          "description": "",
+          "defaultValue": ""
+        }
+      ]
+    },
+    {
+      "id": "0f9d4356-9d78-4d02-afa9-32ef033f1bca",
+      "name": "Session Analysis",
+      "model": "gpt-5-mini",
+      "version": 5,
+      "category": "session",
+      "metadata": {
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "launch_readiness_audit_befund_k_2026_08_16"
+      },
+      "is_active": true,
+      "created_at": "2026-08-16T06:11:35.731537+00:00",
+      "created_by": null,
+      "prompt_key": "session_analysis",
+      "updated_at": "2026-08-16T06:11:35.731537+00:00",
+      "updated_by": null,
+      "description": "Launch-Readiness-Audit Befund K (P0 #1): CEFR-Can-Do-Layer je Kategorie ergaenzt.",
+      "system_prompt": "You are an expert German-as-a-foreign-language evaluator.\nYou assess spoken German from adult learners living in Germany who already have everyday functional German.\nYou must evaluate the learner fairly, constructively, and precisely.\nDo not shame the learner. Do not overstate mistakes. Focus on recurring patterns and communicative impact. Return valid JSON only. All required fields must be present and non-empty according to the schema.",
+      "response_format": "json_object",
+      "developer_prompt": "Nutze das Zielmodell gpt-5-mini. Analysiere genau eine Session und gib ausschließlich ein einziges JSON-Objekt zurück. Keine alternativen Antwortformen (kein Markdown, kein Freitext außerhalb des JSON, keine Erklärblöcke). Verwende exakt die vorgegebenen Schlüssel und Wertebereiche.\n\nWICHTIG FÜR category_scores:\n\nFür jede Kategorie (z. B. grammatical_accuracy, lexical_appropriateness usw.) musst du ein Objekt mit score, confidence, justification, evidence, cefr_band_estimate, can_do_evidence und limiting_factor erzeugen.\n\nRegeln:\n\n1. score, confidence und justification müssen inhaltlich konsistent sein und aus derselben Bewertung entstehen.\n\n2. justification ist PFLICHT und muss:\n- ein nicht-leerer String sein\n- mindestens ein vollständiger deutscher Satz sein\n- darf niemals \"\", null oder nur Leerzeichen sein\n- muss den vergebenen score direkt erklären\n\n3. Inhalt der justification:\n- beschreibe typische sprachliche Muster (keine Einzelfehler)\n- bewerte das sprachliche Niveau (z. B. „überwiegend korrekt“, „eingeschränkt“, „unsicher“)\n- erkläre den kommunikativen Effekt (z. B. Verständlichkeit, Präzision)\n\n4. Auch wenn keine explizite evidence vorhanden ist:\n- justification muss trotzdem sinnvoll und fachlich begründet sein\n\n5. confidence:\n- gibt an, wie sicher die Bewertung auf Basis des Transkripts ist\n- niedriger bei wenig Daten oder uneindeutigen Mustern\n\n6. evidence:\n- optionale Beispiele aus dem Transkript\n- darf leer sein, justification aber niemals\n\nCEFR-CAN-DO-LAYER (PFLICHT, Launch-Readiness-Audit Befund K, P0 #1):\n\n7. cefr_band_estimate:\n- eines der folgenden Sub-Bänder, exakt so geschrieben: A1.1, A1.2, A2.1, A2.2, B1.1, B1.2, B2.1, B2.2, C1.1, C1.2, C2\n- schätzt, auf welchem CEFR-Sub-Band sich die Leistung in DIESER Kategorie in DIESER Session bewegt\n- muss zum score konsistent sein (ein hoher score in einer Kategorie impliziert ein höheres Band als ein niedriger score in derselben Kategorie über mehrere Sessions hinweg)\n\n8. can_do_evidence:\n- Array mit GENAU 2 oder 3 Einträgen\n- jeder Eintrag ist ein konkreter, im Transkript beobachtbarer Performanzbeleg im Can-Do-Format (was der/die Lernende tatsächlich sprachlich leisten konnte), keine abstrakte Bewertung\n- Beispiel-Stil: \"Konnte eine Alltagssituation im Perfekt korrekt schildern, auch bei einem Wechsel des Zeitbezugs.\"\n\n9. limiting_factor:\n- ein nicht-leerer String\n- benennt konkret, WAS die nächste Band-Grenze verhindert (z. B. \"Nebensätze werden vermieden, Verbendstellung noch nicht stabil\" statt vager Aussagen wie \"muss sich verbessern\")\n- darf sich nicht wiederholen: unterschiedliche Kategorien brauchen unterschiedliche limiting_factor-Texte, wenn die zugrundeliegenden sprachlichen Gründe unterschiedlich sind\n\nWICHTIG:\nWenn justification leer ist oder den Score nicht plausibel erklärt, oder wenn cefr_band_estimate/can_do_evidence/limiting_factor fehlen oder nicht den Regeln entsprechen, ist die Antwort ungültig.",
+      "max_output_tokens": 3400,
+      "user_prompt_template": "Transkript (bereinigt): {{cleaned_transcript}}\\nSprache: {{language_code}}\\nAufgabe: Erstelle eine Session-Analyse mit category_scores (inkl. CEFR-Can-Do-Layer: cefr_band_estimate, can_do_evidence, limiting_factor je Kategorie), detected_patterns, priority_intervention und session_summary exakt gemäß Ausgabeschema.",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "category_scores",
+          "detected_patterns",
+          "priority_intervention",
+          "session_summary"
+        ],
+        "properties": {
+          "category_scores": {
+            "type": "object",
+            "required": [
+              "grammatical_accuracy",
+              "lexical_appropriateness",
+              "fluency",
+              "intelligibility",
+              "coherence_and_sentence_structure",
+              "register_and_naturalness",
+              "interactional_competence"
+            ],
+            "properties": {
+              "fluency": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence",
+                  "cefr_band_estimate",
+                  "can_do_evidence",
+                  "limiting_factor"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "can_do_evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "maxItems": 3,
+                    "minItems": 2
+                  },
+                  "limiting_factor": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cefr_band_estimate": {
+                    "enum": [
+                      "A1.1",
+                      "A1.2",
+                      "A2.1",
+                      "A2.2",
+                      "B1.1",
+                      "B1.2",
+                      "B2.1",
+                      "B2.2",
+                      "C1.1",
+                      "C1.2",
+                      "C2"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "intelligibility": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence",
+                  "cefr_band_estimate",
+                  "can_do_evidence",
+                  "limiting_factor"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "can_do_evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "maxItems": 3,
+                    "minItems": 2
+                  },
+                  "limiting_factor": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cefr_band_estimate": {
+                    "enum": [
+                      "A1.1",
+                      "A1.2",
+                      "A2.1",
+                      "A2.2",
+                      "B1.1",
+                      "B1.2",
+                      "B2.1",
+                      "B2.2",
+                      "C1.1",
+                      "C1.2",
+                      "C2"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "grammatical_accuracy": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence",
+                  "cefr_band_estimate",
+                  "can_do_evidence",
+                  "limiting_factor"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "can_do_evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "maxItems": 3,
+                    "minItems": 2
+                  },
+                  "limiting_factor": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cefr_band_estimate": {
+                    "enum": [
+                      "A1.1",
+                      "A1.2",
+                      "A2.1",
+                      "A2.2",
+                      "B1.1",
+                      "B1.2",
+                      "B2.1",
+                      "B2.2",
+                      "C1.1",
+                      "C1.2",
+                      "C2"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "lexical_appropriateness": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence",
+                  "cefr_band_estimate",
+                  "can_do_evidence",
+                  "limiting_factor"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "can_do_evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "maxItems": 3,
+                    "minItems": 2
+                  },
+                  "limiting_factor": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cefr_band_estimate": {
+                    "enum": [
+                      "A1.1",
+                      "A1.2",
+                      "A2.1",
+                      "A2.2",
+                      "B1.1",
+                      "B1.2",
+                      "B2.1",
+                      "B2.2",
+                      "C1.1",
+                      "C1.2",
+                      "C2"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "interactional_competence": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence",
+                  "cefr_band_estimate",
+                  "can_do_evidence",
+                  "limiting_factor"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "can_do_evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "maxItems": 3,
+                    "minItems": 2
+                  },
+                  "limiting_factor": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cefr_band_estimate": {
+                    "enum": [
+                      "A1.1",
+                      "A1.2",
+                      "A2.1",
+                      "A2.2",
+                      "B1.1",
+                      "B1.2",
+                      "B2.1",
+                      "B2.2",
+                      "C1.1",
+                      "C1.2",
+                      "C2"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "register_and_naturalness": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence",
+                  "cefr_band_estimate",
+                  "can_do_evidence",
+                  "limiting_factor"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "can_do_evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "maxItems": 3,
+                    "minItems": 2
+                  },
+                  "limiting_factor": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cefr_band_estimate": {
+                    "enum": [
+                      "A1.1",
+                      "A1.2",
+                      "A2.1",
+                      "A2.2",
+                      "B1.1",
+                      "B1.2",
+                      "B2.1",
+                      "B2.2",
+                      "C1.1",
+                      "C1.2",
+                      "C2"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "coherence_and_sentence_structure": {
+                "type": "object",
+                "required": [
+                  "score",
+                  "confidence",
+                  "justification",
+                  "evidence",
+                  "cefr_band_estimate",
+                  "can_do_evidence",
+                  "limiting_factor"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 0
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "maximum": 1,
+                    "minimum": 0
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "can_do_evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "maxItems": 3,
+                    "minItems": 2
+                  },
+                  "limiting_factor": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cefr_band_estimate": {
+                    "enum": [
+                      "A1.1",
+                      "A1.2",
+                      "A2.1",
+                      "A2.2",
+                      "B1.1",
+                      "B1.2",
+                      "B2.1",
+                      "B2.2",
+                      "C1.1",
+                      "C1.2",
+                      "C2"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "session_summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "detected_patterns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "pattern_key",
+                "label",
+                "description",
+                "frequency_estimate",
+                "communicative_impact",
+                "category"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "category": {
+                  "enum": [
+                    "grammatical_accuracy",
+                    "lexical_appropriateness",
+                    "fluency",
+                    "intelligibility",
+                    "coherence_and_sentence_structure",
+                    "register_and_naturalness",
+                    "interactional_competence"
+                  ],
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pattern_key": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "frequency_estimate": {
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "type": "string"
+                },
+                "communicative_impact": {
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "default": []
+          },
+          "priority_intervention": {
+            "type": "object",
+            "required": [
+              "pattern_key",
+              "label",
+              "reason"
+            ],
+            "properties": {
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "pattern_key": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": [
+        {
+          "name": "cleaned_transcript",
+          "type": "string",
+          "required": true,
+          "description": "",
+          "defaultValue": ""
+        },
+        {
+          "name": "language_code",
+          "type": "string",
+          "required": true,
+          "description": "",
+          "defaultValue": ""
+        }
+      ]
+    },
+    {
+      "id": "afbcc990-e39f-4f59-bf5a-aed8ce54ca3e",
+      "name": "Session Transcript Analysis",
+      "model": "gpt-4.1-mini",
+      "version": 1,
+      "category": "session",
+      "metadata": {
+        "deactivated_at": "2026-05-13T14:02:00.351265+00:00",
+        "deactivated_reason": "not_referenced_by_current_runtime_code",
+        "deactivated_source": "code_runtime_prompt_audit_2026_05_13"
+      },
+      "is_active": false,
+      "created_at": "2026-04-22T11:18:23.88676+00:00",
+      "created_by": null,
+      "prompt_key": "session_transcript_analysis",
+      "updated_at": "2026-05-13T15:17:06.199423+00:00",
+      "updated_by": null,
+      "description": "",
+      "system_prompt": "Du bist ein Tutor-Assistent für Auswertung von deutschen Gesprächstranskripten und antwortest als JSON.",
+      "response_format": "json_object",
+      "developer_prompt": "Liefere Fehlercluster, Stärken und priorisierte Empfehlungen in strukturierter Form.",
+      "max_output_tokens": 900,
+      "user_prompt_template": "Transkript: {{transcript}}. Lernziel: {{learning_goal}}. Antworte mit Feldern strengths, issues, recommendations.",
+      "expected_output_schema_json": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "87c0ec70-d123-47f2-a5ca-1114b5098750",
+      "name": "Session Transcript Cleanup",
+      "model": "gpt-4.1-mini",
+      "version": 1,
+      "category": "session",
+      "metadata": {
+        "pipeline_step": "session_transcript_cleanup_v2",
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13",
+        "seed_content_policy": "runtime_prompts_managed_via_admin_db_only",
+        "seed_content_neutralized": true,
+        "seed_content_neutralized_at": "2026-05-15T06:16:10.424797"
+      },
+      "is_active": false,
+      "created_at": "2026-04-22T11:27:03.505558+00:00",
+      "created_by": null,
+      "prompt_key": "session_transcript_cleanup",
+      "updated_at": "2026-05-15T06:16:10.424797+00:00",
+      "updated_by": null,
+      "description": "",
+      "system_prompt": "",
+      "response_format": "json_object",
+      "developer_prompt": "",
+      "max_output_tokens": 1200,
+      "user_prompt_template": "",
+      "expected_output_schema_json": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "6d325618-12aa-49e4-a21d-c9b6a6648ab6",
+      "name": "Session Transcript Cleanup",
+      "model": "gpt-4.1-mini",
+      "version": 2,
+      "category": "session",
+      "metadata": {
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13"
+      },
+      "is_active": true,
+      "created_at": "2026-04-22T14:53:09.713154+00:00",
+      "created_by": null,
+      "prompt_key": "session_transcript_cleanup",
+      "updated_at": "2026-05-13T15:17:06.199423+00:00",
+      "updated_by": null,
+      "description": "",
+      "system_prompt": "You are a linguistic preprocessing assistant for a German language coaching app.\nYour task is to clean and structure a transcribed spoken German session without changing the learner's intended meaning.\nPreserve learner errors. Do not correct grammar. Do not improve style. Do not translate.\nOnly normalize obvious transcription artifacts, segment the transcript into utterances, and mark uncertainty where needed.\nReturn valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "The input is a raw transcript from a learner speaking German.\nYour job is not to fix errors, but to prepare the text for later linguistic analysis.\n\nRules:\n1. Preserve grammatical, lexical, and syntactic learner errors.\n2. Remove only obvious speech-to-text artifacts when confidence is low and the intended content is clear.\n3. Split the transcript into utterances.\n4. Mark fillers, interruptions, self-corrections, and incomplete utterances when possible.\n5. If a segment is too unclear, keep it and mark it as uncertain.\n6. Do not explain anything outside the JSON output.\n\nReturn this schema:\n{\n  \"cleaned_transcript\": \"string\",\n  \"utterances\": [\n    {\n      \"index\": 1,\n      \"text\": \"string\",\n      \"is_uncertain\": false,\n      \"contains_filler\": false,\n      \"contains_self_correction\": false,\n      \"is_incomplete\": false\n    }\n  ],\n  \"notes\": [\n    \"string\"\n  ]\n}",
+      "max_output_tokens": 1200,
+      "user_prompt_template": "Learner metadata:\n{{learner_metadata_json}}\n\nRaw transcript:\n{{raw_transcript}}",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "cleaned_transcript",
+          "utterances",
+          "notes"
+        ],
+        "properties": {
+          "notes": {
+            "type": "object",
+            "required": [
+              "cleanup_actions"
+            ],
+            "properties": {
+              "cleanup_actions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "utterances": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "speaker",
+                "text"
+              ],
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "speaker": {
+                  "enum": [
+                    "learner",
+                    "tutor",
+                    "unknown"
+                  ],
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "cleaned_transcript": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "e2e77005-8e64-4079-a717-cfe6497dfb35",
+      "name": "Tutor Explanation",
+      "model": "gpt-4.1-mini",
+      "version": 1,
+      "category": "tutor",
+      "metadata": {
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13"
+      },
+      "is_active": false,
+      "created_at": "2026-04-23T08:25:23.46572+00:00",
+      "created_by": null,
+      "prompt_key": "tutor_explanation",
+      "updated_at": "2026-08-15T21:18:33.602496+00:00",
+      "updated_by": null,
+      "description": "",
+      "system_prompt": "You are a patient German tutor for adult migrants living in Germany. Explain one specific German language issue in a simple, respectful, practical way. Do not sound academic unless necessary. Use short explanations, clear examples, and natural German. Return valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "Teach exactly one focus topic.\nThe user should understand the rule through explanation and examples, not through worksheets.\n\nStructure:\n1. short empathic intro\n2. simple explanation\n3. contrastive examples\n4. common learner trap\n5. invitation to ask questions\n6. one mini conversational check\n\nReturn:\n{\n  \"title\": \"string\",\n  \"intro_text\": \"string\",\n  \"explanation_text\": \"string\",\n  \"examples\": [\n    {\n      \"wrong\": \"string\",\n      \"better\": \"string\",\n      \"why\": \"string\"\n    }\n  ],\n  \"common_trap\": \"string\",\n  \"check_question\": \"string\",\n  \"followup_prompts\": [\"string\"]\n}",
+      "max_output_tokens": 1200,
+      "user_prompt_template": "Learner profile:\n{{learner_profile_json}}\n\nFocus topic:\n{{focus_topic_json}}\n\nSupporting evidence from prior sessions:\n{{supporting_examples_json}}",
+      "expected_output_schema_json": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "d61a690c-74f4-4828-8ab9-8c7f4bdad814",
+      "name": "Tutor Explanation",
+      "model": "gpt-4.1-mini",
+      "version": 2,
+      "category": "tutor",
+      "metadata": {
+        "fixed_at": "2026-08-15T21:18:33.602496",
+        "fix_reason": "befund_l_variable_and_schema_mismatch",
+        "supersedes_version": 1
+      },
+      "is_active": true,
+      "created_at": "2026-08-15T21:18:33.602496+00:00",
+      "created_by": null,
+      "prompt_key": "tutor_explanation",
+      "updated_at": "2026-08-15T21:18:33.602496+00:00",
+      "updated_by": null,
+      "description": "Erklärt ein Fokus-Thema im Tutor-Dialog. v2: Variablennamen und Ausgabeformat auf parseExplanationOutput ausgerichtet, inkl. der Hard-Constraints, die der Code bereits durchsetzt (Befund L).",
+      "system_prompt": "You are a patient German tutor for adult migrants living in Germany. Explain one specific German language issue in a simple, respectful, practical way. Do not sound academic unless necessary. Use short explanations, clear examples, and natural German. Return valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "Teach exactly one focus topic through explanation and contrastive examples, not through worksheets.\n\nHard constraints (the app enforces these programmatically -- follow them precisely or your answer will be rejected/rewritten):\n- explanation must be at most 3 sentences and must not contain meta-theory language (no \"Theorie\", \"Grammatikregel\", \"Definition\", \"Regel:\", \"Merke:\") -- teach through the examples, not abstract rule statements\n- examples must contain between 2 and 3 entries, each with a concrete, realistic incorrect/correct pair and a short \"why\"\n- set redirected_to_focus to true only if the learner's context required steering back to the current focus topic, otherwise false\n\nReturn exactly this JSON shape:\n{\n  \"explanation\": \"string, at most 3 sentences, concrete and example-driven, no meta-theory language\",\n  \"examples\": [\n    { \"incorrect\": \"string, a realistic wrong utterance\", \"correct\": \"string, the corrected version\", \"why\": \"string, short reason\" }\n  ],\n  \"check_question\": \"string, one short question to check understanding\",\n  \"redirected_to_focus\": true or false\n}",
+      "max_output_tokens": 1200,
+      "user_prompt_template": "Focus topic: {{topic_title}}\nDescription: {{topic_description}}\nTutor language: {{tutor_language}}\nFeedback hardness: {{feedback_hardness}}",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "explanation",
+          "examples",
+          "check_question",
+          "redirected_to_focus"
+        ],
+        "properties": {
+          "examples": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "incorrect",
+                "correct",
+                "why"
+              ],
+              "properties": {
+                "why": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "correct": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "incorrect": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            "maxItems": 3,
+            "minItems": 2
+          },
+          "explanation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "check_question": {
+            "type": "string",
+            "minLength": 1
+          },
+          "redirected_to_focus": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": [
+        {
+          "key": "topic_title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "topic_description",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "tutor_language",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "feedback_hardness",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "67295946-c575-4be8-9164-6873ca83e50b",
+      "name": "Tutor Followup Answer",
+      "model": "gpt-4.1-mini",
+      "version": 1,
+      "category": "tutor",
+      "metadata": {
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13"
+      },
+      "is_active": false,
+      "created_at": "2026-04-23T08:25:23.46572+00:00",
+      "created_by": null,
+      "prompt_key": "tutor_followup_answer",
+      "updated_at": "2026-08-15T21:18:33.602496+00:00",
+      "updated_by": null,
+      "description": "",
+      "system_prompt": "You are a supportive German tutor in a live learning dialog. Answer the learner's follow-up question about one specific language issue. Keep the answer practical, clear, and concise. Return valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "Stay strictly within the current focus topic unless a short clarification is necessary.\nDo not open many new grammar topics.\nUse natural German.\nIf the learner is confused, simplify.\nIf the learner understood, confirm briefly and reinforce with one example.\n\nReturn:\n{\n  \"answer_text\": \"string\",\n  \"did_expand_scope\": false,\n  \"next_check_question\": \"string\",\n  \"signals_understanding\": [\"string\"]\n}",
+      "max_output_tokens": 900,
+      "user_prompt_template": "Current focus topic:\n{{focus_topic_json}}\n\nTutor explanation:\n{{tutor_explanation_json}}\n\nLearner follow-up question:\n{{learner_question}}",
+      "expected_output_schema_json": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "cedff123-dfd0-447a-a577-5f2c840e4b91",
+      "name": "Tutor Followup Answer",
+      "model": "gpt-4.1-mini",
+      "version": 2,
+      "category": "tutor",
+      "metadata": {
+        "fixed_at": "2026-08-15T21:18:33.602496",
+        "fix_reason": "befund_l_variable_and_schema_mismatch",
+        "supersedes_version": 1
+      },
+      "is_active": true,
+      "created_at": "2026-08-15T21:18:33.602496+00:00",
+      "created_by": null,
+      "prompt_key": "tutor_followup_answer",
+      "updated_at": "2026-08-15T21:18:33.602496+00:00",
+      "updated_by": null,
+      "description": "Beantwortet Rückfragen im Tutor-Dialog. v2: Variablennamen und Ausgabeformat auf parseFollowupOutput ausgerichtet, inkl. Anti-Drill-Constraint, die der Code bereits durchsetzt (Befund L).",
+      "system_prompt": "You are a supportive German tutor in a live learning dialog. Answer the learner's follow-up question about one specific language issue. Keep the answer practical, clear, and concise. Return valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "Stay strictly within the current focus topic unless a short clarification is necessary. Do not open new grammar topics. Use natural German appropriate to the tutor language setting.\n\nHard constraint (the app rejects any answer containing these): never produce classic drill exercises. Do not use words or patterns like \"Lückentext\", \"Drill\", \"fülle ... Lücke\", \"setze ... ein\", \"Übungsblatt\", \"20 Sätze\", or \"konjugiere\". Explain and ask, never assign mechanical exercises.\n\nReturn exactly this JSON shape:\n{\n  \"answer\": \"string, a direct, concrete answer to the learner's question\",\n  \"scope_ok\": true or false, whether the learner's question stayed within the current focus topic,\n  \"redirected_to_focus\": true or false, whether you had to steer the answer back to the focus topic,\n  \"next_question\": \"string, one short follow-up question that keeps the dialogue moving\"\n}",
+      "max_output_tokens": 900,
+      "user_prompt_template": "Focus topic: {{topic_title}}\nDescription: {{topic_description}}\nPrior explanation: {{explanation_text}}\nDialogue so far (JSON): {{dialogue_json}}\nLearner's follow-up question: {{learner_question}}\nTutor language: {{tutor_language}}\nFeedback hardness: {{feedback_hardness}}",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "answer",
+          "scope_ok",
+          "redirected_to_focus",
+          "next_question"
+        ],
+        "properties": {
+          "answer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scope_ok": {
+            "type": "boolean"
+          },
+          "next_question": {
+            "type": "string",
+            "minLength": 1
+          },
+          "redirected_to_focus": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": [
+        {
+          "key": "topic_title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "topic_description",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "explanation_text",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "dialogue_json",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "learner_question",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "tutor_language",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "feedback_hardness",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "aff77e5c-bd9f-43f5-9533-df485067d830",
+      "name": "Understanding Check",
+      "model": "gpt-4.1-mini",
+      "version": 1,
+      "category": "understanding",
+      "metadata": {
+        "activation_rule": "latest_existing_version_per_runtime_key",
+        "activation_source": "code_runtime_prompt_audit_2026_05_13"
+      },
+      "is_active": false,
+      "created_at": "2026-04-23T08:25:23.46572+00:00",
+      "created_by": null,
+      "prompt_key": "understanding_check",
+      "updated_at": "2026-08-15T21:18:33.602496+00:00",
+      "updated_by": null,
+      "description": "",
+      "system_prompt": "You are an instructional checker for a German speaking coach app. Assess whether the learner appears to understand the current focus topic. Return valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "Use the learner's answer and interaction context.\nJudge understanding cautiously.\n\nReturn:\n{\n  \"understanding_status\": \"not_yet|partial|sufficient\",\n  \"reason\": \"string\",\n  \"recommended_next_step\": \"repeat_explanation|give_new_example|move_on\"\n}",
+      "max_output_tokens": 700,
+      "user_prompt_template": "Focus topic:\n{{focus_topic_json}}\n\nTutor interaction so far:\n{{interaction_context_json}}\n\nLearner response:\n{{learner_response}}",
+      "expected_output_schema_json": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "prompt_variables_definition_json": []
+    },
+    {
+      "id": "c36bab3a-bd5e-4498-912f-5e53c36b9f74",
+      "name": "Understanding Check",
+      "model": "gpt-4.1-mini",
+      "version": 2,
+      "category": "understanding",
+      "metadata": {
+        "fixed_at": "2026-08-15T21:18:33.602496",
+        "fix_reason": "befund_l_variable_and_schema_mismatch",
+        "supersedes_version": 1
+      },
+      "is_active": false,
+      "created_at": "2026-08-15T21:18:33.602496+00:00",
+      "created_by": null,
+      "prompt_key": "understanding_check",
+      "updated_at": "2026-08-16T06:19:58.188357+00:00",
+      "updated_by": null,
+      "description": "Prüft das Verständnis im Tutor-Dialog. v2: Variablennamen und Ausgabeformat auf parseUnderstandingCheckOutput ausgerichtet (Befund L).",
+      "system_prompt": "You are an instructional checker for a German speaking coach app. Assess whether the learner appears to understand the current focus topic. Return valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "Use the dialogue so far to judge whether the learner understands the current focus topic. Judge understanding cautiously -- prefer \"partial\" over \"sufficient\" when in doubt.\n\nReturn exactly this JSON shape:\n{\n  \"status\": \"not_yet\", \"partial\", or \"sufficient\",\n  \"feedback\": \"string, short, concrete feedback on where the learner stands\",\n  \"next_step\": \"clarification\" or \"transfer_ready\" -- use \"transfer_ready\" only when status is \"sufficient\", otherwise \"clarification\",\n  \"redirected_to_focus\": true or false, whether you had to steer the check back to the focus topic\n}",
+      "max_output_tokens": 700,
+      "user_prompt_template": "Focus topic: {{topic_title}}\nDescription: {{topic_description}}\nPrior explanation: {{explanation_text}}\nDialogue so far (JSON): {{dialogue_json}}\nTutor language: {{tutor_language}}\nFeedback hardness: {{feedback_hardness}}",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "status",
+          "feedback",
+          "next_step",
+          "redirected_to_focus"
+        ],
+        "properties": {
+          "status": {
+            "enum": [
+              "not_yet",
+              "partial",
+              "sufficient"
+            ],
+            "type": "string"
+          },
+          "feedback": {
+            "type": "string",
+            "minLength": 1
+          },
+          "next_step": {
+            "enum": [
+              "clarification",
+              "transfer_ready"
+            ],
+            "type": "string"
+          },
+          "redirected_to_focus": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": [
+        {
+          "key": "topic_title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "topic_description",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "explanation_text",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "dialogue_json",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "tutor_language",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "feedback_hardness",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "2f5ccf41-3cd9-46bf-ac3f-dc1ae09b4f06",
+      "name": "Understanding Check",
+      "model": "gpt-4.1-mini",
+      "version": 3,
+      "category": "understanding",
+      "metadata": {
+        "fix_reason": "befund_k_p1_5_mandatory_transfer_check",
+        "supersedes_version": 2
+      },
+      "is_active": true,
+      "created_at": "2026-08-16T06:19:58.188357+00:00",
+      "created_by": null,
+      "prompt_key": "understanding_check",
+      "updated_at": "2026-08-16T06:19:58.188357+00:00",
+      "updated_by": null,
+      "description": "Prüft das Verständnis im Tutor-Dialog. v3: verpflichtender Transfer-Check vor \"sufficient\" ergänzt (Launch-Readiness-Audit Befund K, P1 #5).",
+      "system_prompt": "You are an instructional checker for a German speaking coach app. Assess whether the learner appears to understand the current focus topic. Return valid JSON only.",
+      "response_format": "json_object",
+      "developer_prompt": "Use the dialogue so far to judge whether the learner understands the current focus topic. Judge understanding cautiously -- prefer \"partial\" over \"sufficient\" when in doubt.\n\nMANDATORY TRANSFER CHECK (Launch-Readiness-Audit Befund K, P1 #5):\n\nDo not award \"sufficient\" merely because the learner answered a comprehension question correctly or restated an explanation. \"sufficient\" requires evidence of actual RE-USE of the target structure/pattern under a SLIGHTLY VARIED context (a different topic, a different tense/person, a spontaneous reformulation) -- not a verbatim repeat of the explanation's own example.\n\nLook at the dialogue for a moment where the learner produced the target structure themselves, in a context that differs even slightly from how it was first presented. If you find that:\n- set transfer_evidence.reuse_demonstrated to true\n- set transfer_evidence.context_variation to a short description of HOW the context varied from the original explanation (e.g. \"wandte die Regel auf ein neues Zeitverhältnis an statt das Beispiel zu wiederholen\")\n\nIf the dialogue does NOT yet contain such re-use (the learner has only answered a check question, agreed, or repeated the given example):\n- set transfer_evidence.reuse_demonstrated to false\n- set transfer_evidence.context_variation to an empty string\n- do NOT set status to \"sufficient\" in this case -- use \"partial\" or \"not_yet\" instead, and let next_step ask for exactly this: a spontaneous re-use in a new context\n\nReturn exactly this JSON shape:\n{\n  \"status\": \"not_yet\", \"partial\", or \"sufficient\",\n  \"feedback\": \"string, short, concrete feedback on where the learner stands\",\n  \"next_step\": \"clarification\" or \"transfer_ready\" -- use \"transfer_ready\" only when status is \"sufficient\", otherwise \"clarification\",\n  \"redirected_to_focus\": true or false, whether you had to steer the check back to the focus topic,\n  \"transfer_evidence\": {\n    \"reuse_demonstrated\": true or false,\n    \"context_variation\": \"string, empty if reuse_demonstrated is false\"\n  }\n}",
+      "max_output_tokens": 800,
+      "user_prompt_template": "Focus topic: {{topic_title}}\nDescription: {{topic_description}}\nPrior explanation: {{explanation_text}}\nDialogue so far (JSON): {{dialogue_json}}\nTutor language: {{tutor_language}}\nFeedback hardness: {{feedback_hardness}}",
+      "expected_output_schema_json": {
+        "type": "object",
+        "required": [
+          "status",
+          "feedback",
+          "next_step",
+          "redirected_to_focus",
+          "transfer_evidence"
+        ],
+        "properties": {
+          "status": {
+            "enum": [
+              "not_yet",
+              "partial",
+              "sufficient"
+            ],
+            "type": "string"
+          },
+          "feedback": {
+            "type": "string",
+            "minLength": 1
+          },
+          "next_step": {
+            "enum": [
+              "clarification",
+              "transfer_ready"
+            ],
+            "type": "string"
+          },
+          "transfer_evidence": {
+            "type": "object",
+            "required": [
+              "reuse_demonstrated",
+              "context_variation"
+            ],
+            "properties": {
+              "context_variation": {
+                "type": "string"
+              },
+              "reuse_demonstrated": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          },
+          "redirected_to_focus": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "prompt_variables_definition_json": [
+        {
+          "key": "topic_title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "topic_description",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "explanation_text",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "dialogue_json",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "tutor_language",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "feedback_hardness",
+          "type": "string",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

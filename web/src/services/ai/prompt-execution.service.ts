@@ -1,0 +1,1239 @@
+import { openAiApiService } from '@/services/api';
+import type { ApiErrorCode, ApiRetryHint } from '@/services/api/contracts';
+import { validateWithSchema } from '@/services/ai/json-schema-validator';
+import { applyOvercorrectionGuard } from '@/services/ai/overcorrection-guard';
+import { calculateEstimatedCostUsd } from '@/services/ai/model-pricing';
+import { promptRenderer, PromptRenderer } from '@/services/ai/prompt-renderer';
+import {
+  DbPromptRegistryAdapter,
+  DbPromptRegistryError,
+  type DbPromptFallbackReason,
+  type DbPromptRegistryErrorCode,
+  normalizeLegacyPromptIdentifierToPromptKey,
+} from '@/services/ai/db-prompt-registry';
+import { detectOffensiveLanguage, SAFE_RESPONSE_MESSAGE, type SafetyFlag } from '@/services/ai/safety-filter';
+import { supabaseClient } from '@/services/supabase/client';
+import { userEntitlementsService } from '@/services/supabase/user-entitlements.service';
+import { USAGE_GUARD_ERROR_CODES, getUsageGuardMessage } from '@/services/limits/usage-guards';
+import type { Json } from '@/types/database';
+import type { EffectiveUserEntitlement } from '@/types/user-entitlements';
+import type {
+  LegacyPromptExecutionRequestInput,
+  PromptDefinition,
+  PromptExecutionLogger,
+  PromptExecutionRequest,
+  PromptExecutionResult,
+} from '@/services/ai/types';
+
+type ValidationRepairStatus = 'not_needed' | 'repaired' | 'failed';
+type NormalizedPromptExecutionRequest = PromptExecutionRequest;
+type PromptResolution = {
+  prompt: PromptDefinition | null;
+  source: 'db';
+  fallbackReason: DbPromptFallbackReason | null;
+};
+type OpenAIInvocationResult = {
+  text: string;
+  usage: {
+    inputTokens: number;
+    outputTokens: number;
+    totalTokens: number;
+  };
+  legacyChatCompletion: {
+    choices: Array<{
+      message: {
+        role: 'assistant';
+        content: string;
+      };
+    }>;
+  };
+};
+type TokenReservationResult = {
+  allowed: boolean;
+  hard_limit_reached: boolean;
+  soft_limit_reached: boolean;
+  error_code: string | null;
+  limit_value: number | null;
+  tokens_used: number;
+  tokens_reserved: number;
+  period_start: string;
+  period_end: string;
+};
+
+
+
+type PromptExecutionLogInsert = {
+  prompt_definition_id: string;
+  prompt_key: string;
+  prompt_version: number;
+  model: string;
+  max_output_tokens: number;
+  user_id: string | null;
+  session_id: string | null;
+  feature_name: string;
+  input_payload_json: Json;
+  rendered_prompt_json: Json;
+  raw_model_output: string | null;
+  success: boolean;
+  test_input: Json;
+  rendered_user_prompt: string;
+  request_payload: Json;
+  raw_response: string | null;
+  parsed_output: Json | null;
+  safety_flags: Json;
+  validation_errors: Json;
+  status: 'success' | 'failed';
+  latency_ms: number;
+  error_message: string | null;
+  trace_id: string | null;
+  workflow_id: string | null;
+  pipeline_step: string | null;
+  attempt_number: number;
+  validation_repair_status: ValidationRepairStatus;
+  error_class: string | null;
+  fallback_used: boolean;
+  fallback_reason: DbPromptFallbackReason | DbPromptRegistryErrorCode | null;
+  prompt_source: 'db';
+  input_tokens: number | null;
+  output_tokens: number | null;
+  total_tokens: number | null;
+  estimated_cost_usd: number | null;
+  pricing_version: string | null;
+  created_by: string | null;
+};
+
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function nullableUuid(value: unknown): string | null {
+  return typeof value === 'string' && UUID_REGEX.test(value) ? value : null;
+}
+
+const PROMPT_EXECUTION_LOG_SCHEMA_RULES = {
+  required: ['prompt_definition_id', 'prompt_key', 'prompt_version', 'model', 'max_output_tokens', 'rendered_user_prompt', 'status', 'attempt_number'],
+  jsonFields: ['input_payload_json', 'rendered_prompt_json', 'test_input', 'request_payload', 'parsed_output', 'safety_flags', 'validation_errors'],
+};
+
+function inspectValueWithType(value: unknown): { type: string; value: unknown } {
+  if (value === null) return { type: 'null', value: null };
+  if (Array.isArray(value)) return { type: 'array', value };
+  return { type: typeof value, value };
+}
+type TokenEntitlementGuardResult =
+  | {
+      allowed: true;
+      softLimitWarning: boolean;
+    }
+  | {
+      allowed: false;
+      message: string;
+      errorCode: typeof USAGE_GUARD_ERROR_CODES.TOKEN_LIMIT_EXCEEDED;
+      softLimitWarning: boolean;
+    };
+
+const defaultLogger: PromptExecutionLogger = {
+  info(message, context) {
+    console.info(message, context);
+  },
+  warn(message, context) {
+    console.warn(message, context);
+  },
+  error(message, context) {
+    console.error(message, context);
+  },
+};
+
+const NON_RETRYABLE_API_ERROR_CODES: ApiErrorCode[] = ['invalid_request', 'unauthorized', 'forbidden'];
+const API_KEY_ERROR_MESSAGE = 'API-Key ungültig oder fehlt.';
+class OpenAIPromptExecutionError extends Error {
+  constructor(
+    message: string,
+    readonly code: ApiErrorCode,
+    readonly status: number,
+    readonly retry: ApiRetryHint,
+    readonly contractTraceId: string,
+    readonly userMessage?: string,
+  ) {
+    super(message);
+    this.name = 'OpenAIPromptExecutionError';
+  }
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+function toJson(value: unknown): Json {
+  return JSON.parse(JSON.stringify(value)) as Json;
+}
+
+export class PromptExecutionService {
+  constructor(
+    private readonly dbRegistry: DbPromptRegistryAdapter | null,
+    private readonly renderer: PromptRenderer,
+    private readonly logger: PromptExecutionLogger = defaultLogger,
+  ) {}
+
+  private normalizeRequest(request: LegacyPromptExecutionRequestInput): NormalizedPromptExecutionRequest {
+    // Legacy nur am Eingangsrand, nicht im Logging-Kernpfad.
+    const promptKey = request.promptKey ?? request.promptId ?? request.legacyPromptId;
+
+    if (!promptKey) {
+      throw new Error('Prompt-Ausführung erfordert promptKey.');
+    }
+
+    return {
+      ...request,
+      promptKey,
+    };
+  }
+
+  private buildLogContext(
+    request: NormalizedPromptExecutionRequest,
+    attempt: number,
+    promptResolution?: Pick<PromptResolution, 'source' | 'fallbackReason'>,
+  ) {
+    return {
+      layer: 'PromptExecutionService',
+      promptKey: request.promptKey,
+      prompt_key: request.promptKey,
+      attempt,
+      promptSource: promptResolution?.source ?? null,
+      promptSourceFallbackReason: promptResolution?.fallbackReason ?? null,
+      traceId: request.executionContext?.traceId ?? request.executionContext?.workflowId ?? null,
+      workflowId: request.executionContext?.workflowId ?? null,
+      pipelineStep: request.executionContext?.pipelineStep ?? null,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private async resolvePrompt(promptKey: string): Promise<PromptResolution> {
+    if (this.dbRegistry) {
+      const dbPromptResolution = await this.dbRegistry.getPromptByPromptKey(promptKey);
+      if (dbPromptResolution.prompt) {
+        return {
+          prompt: dbPromptResolution.prompt,
+          source: 'db',
+          fallbackReason: null,
+        };
+      }
+
+      throw new Error(`Kein aktiver DB-Prompt für ${promptKey} gefunden; Seed-Fallback ist deaktiviert.`);
+    }
+
+    throw new Error(
+      `Prompt-Ausführung ohne DB-Registry ist nicht erlaubt; kein aktiver DB-Prompt für ${promptKey} verfügbar.`,
+    );
+  }
+
+  private async persistExecutionLog(params: {
+    request: NormalizedPromptExecutionRequest;
+    prompt: PromptDefinition;
+    renderedPrompt: string;
+    status: 'success' | 'failed';
+    validationErrors: string[];
+    validationRepairStatus: ValidationRepairStatus;
+    attempt: number;
+    latencyMs: number;
+    rawText: string;
+    rawResponseCompat?: string | null;
+    parsedOutput: unknown | null;
+    safetyFlags?: SafetyFlag[];
+    errorMessage?: string;
+    fallbackUsed?: boolean;
+    fallbackReason?: DbPromptFallbackReason | DbPromptRegistryErrorCode | null;
+    promptSource?: 'db';
+    promptSourceFallbackReason?: DbPromptFallbackReason | null;
+    tokenUsage?: {
+      inputTokens: number;
+      outputTokens: number;
+      totalTokens: number;
+      estimatedCostUsd: number;
+      pricingVersion: string;
+    } | null;
+  }) {
+    const effectiveFallbackUsed = Boolean(params.fallbackUsed);
+    const effectiveFallbackReason = params.fallbackReason ?? null;
+
+    const promptKey = normalizeLegacyPromptIdentifierToPromptKey(params.prompt.promptKey);
+    const promptVersion = params.prompt.version;
+    let promptDefinitionId = params.request.logging?.promptDefinitionId ?? null;
+
+    if (!promptDefinitionId) {
+      const { data: promptDefinition, error: promptError } = await supabaseClient
+        .from('prompt_definitions')
+        .select('id')
+        .eq('prompt_key', promptKey)
+        .eq('version', promptVersion)
+        .limit(1)
+        .maybeSingle<{ id: string }>();
+
+      if (promptError || !promptDefinition?.id) {
+        this.logger.warn('Prompt execution log skipped: prompt definition not found', {
+          ...this.buildLogContext(params.request, params.attempt),
+          promptKey,
+          promptVersion,
+        });
+        return;
+      }
+
+      promptDefinitionId = promptDefinition.id;
+    }
+
+  const traceId = params.request.executionContext?.traceId ?? params.request.executionContext?.workflowId ?? null;
+  const workflowId = params.request.executionContext?.workflowId ?? null;
+const rawSessionId =
+  params.request.executionContext?.sessionId ??
+  params.request.logging?.sessionId ??
+  null;
+
+const rawUserId =
+  params.request.logging?.userId ??
+  params.request.logging?.createdBy ??
+  null;
+
+const sessionId = nullableUuid(rawSessionId);
+const userId = nullableUuid(rawUserId);
+const createdBy = nullableUuid(params.request.logging?.createdBy);
+    const featureName =
+      params.request.executionContext?.featureName ??
+      params.request.executionContext?.pipelineStep ??
+      params.request.promptKey;
+    
+    const insertPayload: PromptExecutionLogInsert = {
+      prompt_definition_id: promptDefinitionId,
+      prompt_key: promptKey,
+      prompt_version: promptVersion,
+      model: params.prompt.model,
+      max_output_tokens: params.prompt.maxTokens,
+      user_id: userId,
+      session_id: sessionId,
+      feature_name: featureName,
+      input_payload_json: toJson({
+        prompt_key: params.request.promptKey,
+        variables: params.request.variables,
+        execution_context: params.request.executionContext ?? {},
+        prompt_resolution: {
+          source: params.promptSource ?? null,
+          fallback_reason: params.promptSourceFallbackReason ?? null,
+        },
+      }),
+      rendered_prompt_json: toJson({
+        system_prompt: params.prompt.systemPrompt ?? null,
+        developer_prompt: params.prompt.developerPrompt ?? null,
+        user_prompt: params.renderedPrompt,
+      }),
+      raw_model_output: params.rawText || null,
+      success: params.status === 'success',
+      test_input: toJson(params.request.variables),
+      rendered_user_prompt: params.renderedPrompt,
+      request_payload: toJson({
+        prompt_key: params.request.promptKey,
+        execution_context: params.request.executionContext ?? {},
+        prompt_resolution: {
+          source: params.promptSource ?? null,
+          fallback_reason: params.promptSourceFallbackReason ?? null,
+        },
+      }),
+      raw_response: params.rawResponseCompat ?? params.rawText ?? null,
+      parsed_output: params.parsedOutput !== null ? toJson(params.parsedOutput) : null,
+      safety_flags: toJson(params.safetyFlags ?? []),
+      validation_errors: toJson(params.validationErrors),
+      status: params.status,
+      latency_ms: params.latencyMs,
+      error_message: params.errorMessage ?? null,
+      trace_id: traceId,
+      workflow_id: workflowId,
+      pipeline_step: params.request.executionContext?.pipelineStep ?? null,
+      attempt_number: params.attempt,
+      validation_repair_status: params.validationRepairStatus,
+      error_class: params.errorMessage ? 'prompt_execution_error' : null,
+      fallback_used: effectiveFallbackUsed,
+      fallback_reason: effectiveFallbackReason,
+      prompt_source: 'db',
+      input_tokens: params.tokenUsage?.inputTokens ?? null,
+      output_tokens: params.tokenUsage?.outputTokens ?? null,
+      total_tokens: params.tokenUsage?.totalTokens ?? null,
+      estimated_cost_usd: params.tokenUsage?.estimatedCostUsd ?? null,
+      pricing_version: params.tokenUsage?.pricingVersion ?? null,
+      created_by: createdBy,
+    };
+
+    this.logPromptExecutionPayload(insertPayload, params.request, params.attempt);
+    this.validatePromptExecutionPayload(insertPayload, params.request, params.attempt);
+
+    const { error: logError } = await supabaseClient.from('prompt_execution_logs').insert(insertPayload);
+
+    if (logError) {
+      this.logger.warn('Prompt execution log write failed', {
+        ...this.buildLogContext(params.request, params.attempt),
+        logError: {
+          message: logError.message,
+          code: logError.code,
+          details: logError.details,
+          hint: logError.hint,
+        },
+      });
+    }
+  }
+
+  private logPromptExecutionPayload(payload: PromptExecutionLogInsert, request: NormalizedPromptExecutionRequest, attempt: number) {
+    const typedPayload = Object.fromEntries(
+      Object.entries(payload).map(([key, value]) => [key, inspectValueWithType(value)]),
+    );
+
+    this.logger.info('Prompt execution log insert payload', {
+      ...this.buildLogContext(request, attempt),
+      table: 'prompt_execution_logs',
+      payload: typedPayload,
+    });
+  }
+
+  private validatePromptExecutionPayload(payload: PromptExecutionLogInsert, request: NormalizedPromptExecutionRequest, attempt: number) {
+    const missingRequired = PROMPT_EXECUTION_LOG_SCHEMA_RULES.required.filter((field) => payload[field as keyof PromptExecutionLogInsert] == null);
+    const invalidJsonFields = PROMPT_EXECUTION_LOG_SCHEMA_RULES.jsonFields.filter((field) => {
+      const value = payload[field as keyof PromptExecutionLogInsert];
+      if (value === null) return false;
+      try {
+        JSON.stringify(value);
+        return false;
+      } catch {
+        return true;
+      }
+    });
+
+    this.logger.info('Prompt execution log schema comparison', {
+      ...this.buildLogContext(request, attempt),
+      table: 'prompt_execution_logs',
+      checks: {
+        required_fields_missing: missingRequired,
+        json_fields_invalid: invalidJsonFields,
+        notes: {
+          user_id_nullable: true,
+          prompt_key_not_null: true,
+          status_not_null: true,
+          created_at_default_utc_now: true,
+        },
+      },
+    });
+
+    if (missingRequired.length > 0 || invalidJsonFields.length > 0) {
+      throw new Error(
+        `Invalid prompt execution log payload (missing=${missingRequired.join(',') || 'none'}, invalidJson=${invalidJsonFields.join(',') || 'none'})`,
+      );
+    }
+  }
+
+  private async callOpenAI(
+    renderedPrompt: string,
+    model: string,
+    maxTokens: number,
+    outputFormat: PromptDefinition['outputFormat'],
+    traceId: string,
+    systemPrompt?: string,
+    developerPrompt?: string,
+    outputSchema?: unknown,
+    promptKey?: string,
+  ): Promise<OpenAIInvocationResult> {
+    if (!systemPrompt || systemPrompt.trim().length === 0) {
+      throw new Error('systemPrompt ist erforderlich; Laufzeit-Default-Systemprompt ist deaktiviert.');
+    }
+
+    const result = await openAiApiService.createResponse({
+      model,
+      maxOutputTokens: maxTokens,
+      outputFormat,
+      traceId,
+      promptKey,
+      structuredOutput:
+        outputFormat === 'json_object' && outputSchema
+          ? { name: 'prompt_response_schema', schema: outputSchema }
+          : undefined,
+      input: [
+        {
+          role: 'system',
+          content: systemPrompt,
+        },
+        ...(developerPrompt
+          ? [
+              {
+                role: 'developer' as const,
+                content: developerPrompt,
+              },
+            ]
+          : []),
+        {
+          role: 'user',
+          content: renderedPrompt,
+        },
+      ],
+    });
+
+    if (!result.ok) {
+      const { error, status, retry, traceId: contractTraceId } = result.response;
+      const retryHint = retry.recommended
+        ? ` Retry empfohlen (maxAttempts=${retry.maxAttempts ?? 1}, baseDelayMs=${retry.baseDelayMs ?? 0}).`
+        : ' Kein Retry empfohlen.';
+      const userMessage = NON_RETRYABLE_API_ERROR_CODES.includes(error.code) ? API_KEY_ERROR_MESSAGE : undefined;
+
+      throw new OpenAIPromptExecutionError(
+        `[${error.code}] OpenAI-Request fehlgeschlagen (status=${status}, traceId=${contractTraceId}). ${error.message}.${retryHint}`,
+        error.code,
+        status,
+        retry,
+        contractTraceId,
+        userMessage,
+      );
+    }
+
+    return {
+      text: result.response.data.text,
+      usage: {
+        inputTokens: result.response.data.usage?.input_tokens ?? 0,
+        outputTokens: result.response.data.usage?.output_tokens ?? 0,
+        totalTokens:
+          result.response.data.usage?.total_tokens ??
+          (result.response.data.usage?.input_tokens ?? 0) + (result.response.data.usage?.output_tokens ?? 0),
+      },
+      legacyChatCompletion: {
+        choices: [
+          {
+            message: {
+              role: 'assistant',
+              content: result.response.data.text,
+            },
+          },
+        ],
+      },
+    };
+  }
+
+private async reserveTokensForExecution(params: { userId: string; reservedTokens: number }) {
+  const { data, error } = await supabaseClient.rpc('reserve_user_tokens', {
+    p_user_id: params.userId,
+    p_tokens: Math.max(0, Math.round(params.reservedTokens)),
+    p_soft_limit_ratio: 0.8,
+  });
+
+  if (error) {
+    this.logger.warn('Token reservation check failed', {
+      userId: params.userId,
+      error: {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+      },
+    });
+
+    return null;
+  }
+
+  return Array.isArray(data) ? ((data[0] ?? null) as TokenReservationResult | null) : null;
+}
+
+private async finalizeTokenUsage(params: {
+  userId: string;
+  periodStart: string;
+  reservedTokens: number;
+  actualTokens: number;
+}): Promise<void> {
+  const { error } = await supabaseClient.rpc('finalize_user_token_usage', {
+    p_user_id: params.userId,
+    p_period_start: params.periodStart,
+    p_reserved_tokens: Math.max(0, Math.round(params.reservedTokens)),
+    p_actual_used: Math.max(0, Math.round(params.actualTokens)),
+  });
+
+  if (error) {
+    this.logger.warn('Token usage finalization failed', {
+      userId: params.userId,
+      periodStart: params.periodStart,
+      error: {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+      },
+    });
+  }
+}
+
+private async releaseReservedTokens(params: {
+  userId: string;
+  periodStart: string;
+  reservedTokens: number;
+}): Promise<void> {
+  const { error } = await supabaseClient.rpc('release_reserved_user_tokens', {
+    p_user_id: params.userId,
+    p_period_start: params.periodStart,
+    p_reserved_tokens: Math.max(0, Math.round(params.reservedTokens)),
+  });
+
+  if (error) {
+    this.logger.warn('Reserved token release failed', {
+      userId: params.userId,
+      periodStart: params.periodStart,
+      error: {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+      },
+    });
+  }
+}
+
+  private resolveEntitlementPeriodWindow(entitlement: EffectiveUserEntitlement): { periodStart: string; periodEnd: string } {
+    if (
+      entitlement.billingPeriodStart &&
+      entitlement.billingPeriodEnd &&
+      new Date(entitlement.billingPeriodStart).getTime() < new Date(entitlement.billingPeriodEnd).getTime()
+    ) {
+      return {
+        periodStart: entitlement.billingPeriodStart,
+        periodEnd: entitlement.billingPeriodEnd,
+      };
+    }
+
+    const now = new Date();
+    const fallbackStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+    const fallbackEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
+    return {
+      periodStart: fallbackStart.toISOString(),
+      periodEnd: fallbackEnd.toISOString(),
+    };
+  }
+
+  private async enforceMonthlyTokenEntitlement(params: {
+    userId: string;
+    estimatedTokens: number;
+  }): Promise<TokenEntitlementGuardResult> {
+    const entitlement = await userEntitlementsService.getEffectiveForUser(params.userId);
+    const monthlyTokenLimit = entitlement.monthlyTokenLimit;
+    if (!monthlyTokenLimit) {
+      return { allowed: true, softLimitWarning: false };
+    }
+
+    const { periodStart, periodEnd } = this.resolveEntitlementPeriodWindow(entitlement);
+    const { data, error } = await supabaseClient
+      .from('user_usage_ledger')
+      .select('tokens_used')
+      .eq('user_id', params.userId)
+      .eq('period_start', periodStart)
+      .limit(1)
+      .maybeSingle<{ tokens_used: number }>();
+
+    if (error) {
+      this.logger.warn('Monthly token entitlement usage lookup failed', {
+        layer: 'PromptExecutionService',
+        userId: params.userId,
+        planKey: entitlement.planKey,
+        periodStart,
+        periodEnd,
+        errorMessage: error.message,
+      });
+    }
+
+    const tokensUsed = data?.tokens_used ?? 0;
+    const projectedTotal = tokensUsed + params.estimatedTokens;
+    const softLimitThreshold = Math.ceil(monthlyTokenLimit * 0.8);
+    const softLimitWarning = projectedTotal >= softLimitThreshold;
+
+    if (projectedTotal > monthlyTokenLimit) {
+      this.logger.warn('Prompt execution blocked by monthly token entitlement guard', {
+        layer: 'PromptExecutionService',
+        userId: params.userId,
+        planKey: entitlement.planKey,
+        periodStart,
+        periodEnd,
+        monthlyTokenLimit,
+        tokensUsed,
+        estimatedTokens: params.estimatedTokens,
+        projectedTotal,
+        reason: 'monthly_token_limit_exceeded',
+      });
+      return {
+        allowed: false,
+        message: `Monatliches Token-Limit erreicht (${monthlyTokenLimit}). Verbrauch: ${tokensUsed}, geschätzt für Anfrage: ${params.estimatedTokens}.`,
+        errorCode: USAGE_GUARD_ERROR_CODES.TOKEN_LIMIT_EXCEEDED,
+        softLimitWarning,
+      };
+    }
+
+    return {
+      allowed: true,
+      softLimitWarning,
+    };
+  }
+
+  private async tryRepairJson(
+    rawText: string,
+    errorHint: string,
+    targetSchema: string,
+  ): Promise<unknown | null> {
+    let repairPrompt: PromptResolution;
+    try {
+      repairPrompt = await this.resolvePrompt('json_repair');
+    } catch (error) {
+      throw new Error(
+        'Technischer Fehler: Der erforderliche Repair-Prompt `json_repair` fehlt oder ist inaktiv.',
+      );
+    }
+
+    const repairPromptDefinition = repairPrompt.prompt;
+    if (!repairPromptDefinition) {
+      throw new Error(
+        'Technischer Fehler: Der erforderliche Repair-Prompt `json_repair` fehlt oder ist inaktiv.',
+      );
+    }
+
+    const renderedRepairPrompt = this.renderer.render(repairPromptDefinition.template, {
+      repair_error_hint: errorHint,
+      invalid_json_text: rawText,
+      target_schema_json: targetSchema,
+    });
+
+    const repairResult = await this.callOpenAI(
+      renderedRepairPrompt,
+      repairPromptDefinition.model,
+      repairPromptDefinition.maxTokens,
+      repairPromptDefinition.outputFormat,
+      `repair-${Date.now()}`,
+      repairPromptDefinition.systemPrompt,
+      repairPromptDefinition.developerPrompt,
+      repairPromptDefinition.outputSchema,
+      'json_repair',
+    );
+
+    const repairEnvelope = JSON.parse(repairResult.text) as { repaired_json?: unknown };
+    if (typeof repairEnvelope.repaired_json !== 'string') {
+      return null;
+    }
+
+    return JSON.parse(repairEnvelope.repaired_json);
+  }
+
+  async execute<TOutput = unknown>(
+    request: LegacyPromptExecutionRequestInput,
+  ): Promise<PromptExecutionResult<TOutput>> {
+    const normalizedRequest = this.normalizeRequest(request);
+    const startedAt = Date.now();
+    let resolvedPrompt: PromptResolution;
+    let dbResolutionErrorCode: DbPromptRegistryErrorCode | null = null;
+    let dbResolutionErrorMessage: string | null = null;
+
+    try {
+      resolvedPrompt = await this.resolvePrompt(normalizedRequest.promptKey);
+    } catch (error) {
+      if (error instanceof DbPromptRegistryError) {
+        dbResolutionErrorCode = error.code;
+        dbResolutionErrorMessage = error.message;
+
+        this.logger.error('Prompt resolution failed due to invalid active DB prompt', {
+          promptKey: normalizedRequest.promptKey,
+          errorCode: error.code,
+          errorMessage: error.message,
+          traceId: normalizedRequest.executionContext?.traceId ?? null,
+          workflowId: normalizedRequest.executionContext?.workflowId ?? null,
+          pipelineStep: normalizedRequest.executionContext?.pipelineStep ?? null,
+          timestamp: new Date().toISOString(),
+        });
+
+        resolvedPrompt = {
+          prompt: null,
+          source: 'db',
+          fallbackReason: null,
+        };
+      } else {
+        throw error;
+      }
+    }
+    const prompt = resolvedPrompt.prompt;
+
+    if (dbResolutionErrorCode) {
+      if (prompt) {
+        await this.persistExecutionLog({
+          request: normalizedRequest,
+          prompt,
+          renderedPrompt: '',
+          status: 'failed',
+          validationErrors: [],
+          validationRepairStatus: 'failed',
+          attempt: 0,
+          latencyMs: Date.now() - startedAt,
+          rawText: '',
+          rawResponseCompat: null,
+          parsedOutput: null,
+          errorMessage: dbResolutionErrorMessage ?? 'Aktiver DB-Prompt ist ungültig.',
+          fallbackUsed: false,
+          fallbackReason: dbResolutionErrorCode,
+          promptSource: 'db',
+          promptSourceFallbackReason: null,
+          tokenUsage: null,
+        });
+      }
+
+      return {
+        ok: false,
+        promptKey: normalizedRequest.promptKey,
+        promptVersion: prompt?.version ?? null,
+        promptSource: 'db',
+        promptSourceFallbackReason: null,
+        renderedPrompt: '',
+        model: prompt?.model ?? 'gpt-4.1-mini',
+        attemptCount: 0,
+        latencyMs: Date.now() - startedAt,
+        output: null,
+        fallbackUsed: false,
+        fallbackReason: dbResolutionErrorCode,
+        validationErrors: [],
+        rawText: '',
+        usedMock: false,
+        repairApplied: false,
+        traceId: normalizedRequest.executionContext?.traceId ?? normalizedRequest.executionContext?.workflowId,
+        workflowId: normalizedRequest.executionContext?.workflowId,
+        pipelineStep: normalizedRequest.executionContext?.pipelineStep,
+        errorMessage: dbResolutionErrorMessage ?? 'Aktiver DB-Prompt ist ungültig.',
+      };
+    }
+
+    if (!prompt) {
+      return {
+        ok: false,
+        promptKey: normalizedRequest.promptKey,
+        promptVersion: null,
+        promptSource: 'db',
+        promptSourceFallbackReason: null,
+        renderedPrompt: '',
+        model: 'gpt-4.1-mini',
+        attemptCount: 0,
+        latencyMs: Date.now() - startedAt,
+        output: null,
+        validationErrors: ['Prompt nicht gefunden'],
+        rawText: '',
+        usedMock: false,
+        repairApplied: false,
+        fallbackUsed: false,
+        fallbackReason: null,
+        traceId: normalizedRequest.executionContext?.traceId ?? normalizedRequest.executionContext?.workflowId,
+        workflowId: normalizedRequest.executionContext?.workflowId,
+        pipelineStep: normalizedRequest.executionContext?.pipelineStep,
+        errorMessage: `Prompt mit promptKey ${normalizedRequest.promptKey} nicht gefunden.`,
+      };
+    }
+
+    const renderedPrompt = this.renderer.render(prompt.template, normalizedRequest.variables);
+    const maxRetries = normalizedRequest.maxRetries ?? 2;
+
+    let attempt = 0;
+    let lastErrorMessage = 'Unbekannter Fehler';
+    let validationErrors: string[] = [];
+    let rawText = '';
+    let rawResponseCompat: string | null = null;
+    let repairApplied = false;
+    let safetyFlags: SafetyFlag[] = [];
+    let tokenUsage: {
+      inputTokens: number;
+      outputTokens: number;
+      totalTokens: number;
+      estimatedCostUsd: number;
+      pricingVersion: string;
+    } | null = null;
+    let softLimitWarning = false;
+    const usageUserId = nullableUuid(
+      normalizedRequest.logging?.userId ?? normalizedRequest.logging?.createdBy ?? null,
+    );
+    const reservedTokens = Math.max(prompt.maxTokens, 1);
+    const targetSchema = JSON.stringify(prompt.outputSchema);
+
+    if (!prompt.systemPrompt || prompt.systemPrompt.trim().length === 0) {
+      throw new Error(
+        `Kein systemPrompt für promptKey ${normalizedRequest.promptKey} konfiguriert. Laufzeit-Default ist deaktiviert.`,
+      );
+    }
+
+    if (usageUserId) {
+      const entitlementGuard = await this.enforceMonthlyTokenEntitlement({
+        userId: usageUserId,
+        estimatedTokens: reservedTokens,
+      });
+      softLimitWarning = softLimitWarning || entitlementGuard.softLimitWarning;
+
+      if (!entitlementGuard.allowed) {
+        const elapsedMs = Date.now() - startedAt;
+        await this.persistExecutionLog({
+          request: normalizedRequest,
+          prompt,
+          renderedPrompt,
+          status: 'failed',
+          validationErrors: [],
+          validationRepairStatus: 'not_needed',
+          attempt: 0,
+          latencyMs: elapsedMs,
+          rawText: '',
+          rawResponseCompat: null,
+          parsedOutput: null,
+          safetyFlags: [],
+          errorMessage: entitlementGuard.message,
+          fallbackUsed: false,
+          fallbackReason: null,
+          promptSource: 'db',
+          promptSourceFallbackReason: null,
+          tokenUsage: null,
+        });
+
+        return {
+          ok: false,
+          promptKey: normalizedRequest.promptKey,
+          promptVersion: prompt.version,
+          promptSource: 'db',
+          promptSourceFallbackReason: null,
+          renderedPrompt,
+          model: prompt.model,
+          attemptCount: 0,
+          latencyMs: elapsedMs,
+          output: null,
+          fallbackUsed: false,
+          fallbackReason: null,
+          validationErrors: [],
+          rawText: '',
+          usedMock: false,
+          repairApplied: false,
+          traceId: normalizedRequest.executionContext?.traceId ?? normalizedRequest.executionContext?.workflowId,
+          workflowId: normalizedRequest.executionContext?.workflowId,
+          pipelineStep: normalizedRequest.executionContext?.pipelineStep,
+          errorMessage: entitlementGuard.message,
+          errorCode: entitlementGuard.errorCode,
+          softLimitWarning,
+        };
+      }
+    }
+
+    while (attempt <= maxRetries) {
+      attempt += 1;
+      safetyFlags = [];
+      let reservation: TokenReservationResult | null = null;
+      let reservationFinalized = false;
+      this.logger.info(
+        'Prompt execution started',
+        this.buildLogContext(normalizedRequest, attempt, resolvedPrompt),
+      );
+
+      try {
+          if (usageUserId) {
+            reservation = await this.reserveTokensForExecution({
+              userId: usageUserId,
+              reservedTokens,
+            });
+            softLimitWarning = softLimitWarning || Boolean(reservation?.soft_limit_reached);
+
+            if (reservation && !reservation.allowed && reservation.hard_limit_reached) {
+              const hardStopMessage = getUsageGuardMessage({
+                code: USAGE_GUARD_ERROR_CODES.TOKEN_LIMIT_EXCEEDED,
+                limitValue: reservation.limit_value,
+              });
+              const elapsedMs = Date.now() - startedAt;
+
+              await this.persistExecutionLog({
+                request: normalizedRequest,
+                prompt,
+                renderedPrompt,
+                status: 'failed',
+                validationErrors: [],
+                validationRepairStatus: 'not_needed',
+                attempt,
+                latencyMs: elapsedMs,
+                rawText: '',
+                rawResponseCompat: null,
+                parsedOutput: null,
+                safetyFlags: [],
+                errorMessage: hardStopMessage,
+                fallbackUsed: false,
+                fallbackReason: null,
+                promptSource: 'db',
+                promptSourceFallbackReason: null,
+                tokenUsage: null,
+              });
+
+              return {
+                ok: false,
+                promptKey: normalizedRequest.promptKey,
+                promptVersion: prompt.version,
+                promptSource: 'db',
+                promptSourceFallbackReason: null,
+                renderedPrompt,
+                model: prompt.model,
+                attemptCount: attempt,
+                latencyMs: elapsedMs,
+                output: null,
+                fallbackUsed: false,
+                fallbackReason: null,
+                validationErrors: [],
+                rawText: '',
+                usedMock: false,
+                repairApplied: false,
+                traceId: normalizedRequest.executionContext?.traceId ?? normalizedRequest.executionContext?.workflowId,
+                workflowId: normalizedRequest.executionContext?.workflowId,
+                pipelineStep: normalizedRequest.executionContext?.pipelineStep,
+                errorMessage: hardStopMessage,
+                errorCode: USAGE_GUARD_ERROR_CODES.TOKEN_LIMIT_EXCEEDED,
+                softLimitWarning,
+              };
+            }
+          }
+
+          const invocation = await this.callOpenAI(
+            renderedPrompt,
+            prompt.model,
+            prompt.maxTokens,
+            prompt.outputFormat,
+            normalizedRequest.executionContext?.traceId ??
+              normalizedRequest.executionContext?.workflowId ??
+              `prompt-${Date.now()}`,
+            prompt.systemPrompt,
+            prompt.developerPrompt,
+            prompt.outputSchema,
+            normalizedRequest.promptKey,
+          );
+          rawText = invocation.text;
+          rawResponseCompat = JSON.stringify(invocation.legacyChatCompletion);
+          const pricedUsage = calculateEstimatedCostUsd({
+            model: prompt.model,
+            inputTokens: invocation.usage.inputTokens,
+            outputTokens: invocation.usage.outputTokens,
+          });
+          tokenUsage = {
+            inputTokens: invocation.usage.inputTokens,
+            outputTokens: invocation.usage.outputTokens,
+            totalTokens: invocation.usage.totalTokens,
+            estimatedCostUsd: pricedUsage.estimatedCostUsd,
+            pricingVersion: pricedUsage.pricingVersion,
+          };
+          if (usageUserId && reservation?.period_start) {
+            await this.finalizeTokenUsage({
+              userId: usageUserId,
+              periodStart: reservation.period_start,
+              reservedTokens,
+              actualTokens: invocation.usage.totalTokens,
+            });
+            reservationFinalized = true;
+          }
+        
+
+        let parsed: unknown = null;
+        let needsRepair = false;
+        let repairErrorHint = '';
+
+        try {
+          parsed = JSON.parse(rawText);
+        } catch (error) {
+          needsRepair = true;
+          repairErrorHint = error instanceof Error ? error.message : 'Modellantwort enthält kein valides JSON.';
+        }
+
+        if (!needsRepair) {
+          validationErrors = validateWithSchema(prompt.outputSchema, parsed);
+          if (validationErrors.length > 0) {
+            needsRepair = true;
+            repairErrorHint = `Schema-Validierung fehlgeschlagen: ${validationErrors.join('; ')}`;
+          }
+        }
+
+        if (needsRepair) {
+          const repaired = await this.tryRepairJson(rawText, repairErrorHint, targetSchema);
+          if (!repaired) {
+            throw new Error(repairErrorHint);
+          }
+
+          repairApplied = true;
+          parsed = repaired;
+          validationErrors = validateWithSchema(prompt.outputSchema, parsed);
+          if (validationErrors.length > 0) {
+            throw new Error(`Schema-Validierung nach Repair fehlgeschlagen: ${validationErrors.join('; ')}`);
+          }
+        }
+
+        const guardResult = applyOvercorrectionGuard(parsed, prompt.overcorrectionPolicy);
+        if (guardResult.normalized) {
+          parsed = guardResult.output;
+          validationErrors = validateWithSchema(prompt.outputSchema, parsed);
+          if (validationErrors.length > 0) {
+            throw new Error(`Schema-Validierung nach Overcorrection-Guard fehlgeschlagen: ${validationErrors.join('; ')}`);
+          }
+
+          this.logger.info('Overcorrection guard normalized output', {
+            ...this.buildLogContext(normalizedRequest, attempt, resolvedPrompt),
+            violations: guardResult.violations,
+          });
+        }
+
+        safetyFlags = detectOffensiveLanguage(parsed);
+        if (safetyFlags.length > 0) {
+          throw new Error(SAFE_RESPONSE_MESSAGE);
+        }
+
+        this.logger.info(
+          'Prompt execution success',
+          this.buildLogContext(normalizedRequest, attempt, resolvedPrompt),
+        );
+
+        const elapsedMs = Date.now() - startedAt;
+        await this.persistExecutionLog({
+          request: normalizedRequest,
+          prompt,
+          renderedPrompt,
+          status: 'success',
+          validationErrors: [],
+          validationRepairStatus: repairApplied ? 'repaired' : 'not_needed',
+          attempt,
+          latencyMs: elapsedMs,
+          rawText,
+          rawResponseCompat,
+          parsedOutput: parsed,
+          safetyFlags,
+          fallbackUsed: false,
+          fallbackReason: null,
+          promptSource: 'db',
+          promptSourceFallbackReason: null,
+          tokenUsage,
+        });
+
+        return {
+          ok: true,
+          promptKey: normalizedRequest.promptKey,
+          promptVersion: prompt.version,
+          promptSource: 'db',
+          promptSourceFallbackReason: null,
+          renderedPrompt,
+          model: prompt.model,
+          attemptCount: attempt,
+          latencyMs: elapsedMs,
+          output: parsed as TOutput,
+          validationErrors: [],
+          rawText,
+          usedMock: false,
+          repairApplied,
+          traceId: normalizedRequest.executionContext?.traceId ?? normalizedRequest.executionContext?.workflowId,
+          workflowId: normalizedRequest.executionContext?.workflowId,
+          pipelineStep: normalizedRequest.executionContext?.pipelineStep,
+          fallbackUsed: false,
+          fallbackReason: null,
+          softLimitWarning,
+        };
+      } catch (error) {
+        if (usageUserId && reservation?.period_start && !reservationFinalized) {
+          await this.releaseReservedTokens({
+            userId: usageUserId,
+            periodStart: reservation.period_start,
+            reservedTokens,
+          });
+        }
+
+        const openAiError = error instanceof OpenAIPromptExecutionError ? error : null;
+        lastErrorMessage =
+          openAiError?.userMessage ??
+          (error instanceof Error ? error.message : 'Unbekannter Fehler bei Prompt-Ausführung.');
+
+        this.logger.warn('Prompt execution attempt failed', {
+          ...this.buildLogContext(normalizedRequest, attempt, resolvedPrompt),
+          errorMessage: lastErrorMessage,
+          safetyFlags: safetyFlags.length > 0 ? safetyFlags : undefined,
+          ...(openAiError
+            ? {
+                apiErrorCode: openAiError.code,
+                apiStatus: openAiError.status,
+                apiTraceId: openAiError.contractTraceId,
+                retryRecommended: openAiError.retry.recommended,
+                retryAfterMs: openAiError.retry.retryAfterMs ?? null,
+                retryBaseDelayMs: openAiError.retry.baseDelayMs ?? null,
+                retryMaxAttempts: openAiError.retry.maxAttempts ?? null,
+              }
+            : {}),
+        });
+
+        if (openAiError && NON_RETRYABLE_API_ERROR_CODES.includes(openAiError.code)) {
+          break;
+        }
+
+        if (openAiError && !openAiError.retry.recommended) {
+          break;
+        }
+        if (safetyFlags.length > 0) {
+          break;
+        }
+
+        if (attempt <= maxRetries) {
+          const retryDelayMs = openAiError?.retry.retryAfterMs ?? openAiError?.retry.baseDelayMs ?? attempt * 250;
+          await sleep(retryDelayMs);
+        }
+      }
+    }
+
+    this.logger.error('Prompt execution failed', {
+      ...this.buildLogContext(normalizedRequest, attempt, resolvedPrompt),
+      errorMessage: lastErrorMessage,
+    });
+
+    const fallbackEnabled = normalizedRequest.fallback?.enabled ?? true;
+
+    if (fallbackEnabled) {
+      this.logger.warn('Prompt execution fallback output suppressed', {
+        ...this.buildLogContext(normalizedRequest, attempt, resolvedPrompt),
+        fallbackReason:
+          normalizedRequest.fallback?.reason ?? 'Retries und Repair-Versuche ausgeschöpft.',
+      });
+    }
+
+    await this.persistExecutionLog({
+      request: normalizedRequest,
+      prompt,
+      renderedPrompt,
+      status: 'failed',
+      validationErrors,
+      validationRepairStatus: repairApplied ? 'failed' : 'not_needed',
+      attempt,
+      latencyMs: Date.now() - startedAt,
+      rawText,
+      rawResponseCompat,
+      parsedOutput: null,
+      safetyFlags,
+      errorMessage: lastErrorMessage,
+      fallbackUsed: false,
+      fallbackReason: null,
+      promptSource: 'db',
+      promptSourceFallbackReason: null,
+      tokenUsage,
+    });
+
+    return {
+      ok: false,
+      promptKey: normalizedRequest.promptKey,
+      promptVersion: prompt.version,
+      promptSource: 'db',
+      promptSourceFallbackReason: null,
+      renderedPrompt,
+      model: prompt.model,
+      attemptCount: attempt,
+      latencyMs: Date.now() - startedAt,
+      output: null,
+      fallbackUsed: false,
+      fallbackReason: null,
+      validationErrors,
+      rawText,
+      usedMock: false,
+      repairApplied,
+      traceId: normalizedRequest.executionContext?.traceId ?? normalizedRequest.executionContext?.workflowId,
+      workflowId: normalizedRequest.executionContext?.workflowId,
+      pipelineStep: normalizedRequest.executionContext?.pipelineStep,
+      errorMessage: lastErrorMessage,
+      softLimitWarning,
+    };
+  }
+}
+
+const dbPromptRegistry = new DbPromptRegistryAdapter();
+
+export const promptExecutionService = new PromptExecutionService(dbPromptRegistry, promptRenderer);

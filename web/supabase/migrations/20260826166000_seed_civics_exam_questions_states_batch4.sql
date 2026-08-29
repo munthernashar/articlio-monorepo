@@ -1,0 +1,48 @@
+begin;
+
+insert into public.civics_exam_questions (
+  external_number, scope, bundesland, topic_category, question_text,
+  option_a, option_b, option_c, option_d, correct_option, sort_order, is_active
+) values
+  ('Sachsen-1', 'bundesland', 'Sachsen', 'Landeskunde Sachsen', 'Welches Wappen gehört zum Freistaat Sachsen? Bild 1 Bild 2 Bild 3 Bild 4', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'a', 421, false),
+  ('Sachsen-2', 'bundesland', 'Sachsen', 'Landeskunde Sachsen', 'Welches ist ein Landkreis in Sachsen?', 'Vogtlandkreis', 'Altötting', 'Uckermark', 'Nordfriesland', 'a', 422, true),
+  ('Sachsen-3', 'bundesland', 'Sachsen', 'Landeskunde Sachsen', 'Für wie viele Jahre wird der Landtag in Sachsen gewählt?', '3', '4', '5', '6', 'c', 423, true),
+  ('Sachsen-4', 'bundesland', 'Sachsen', 'Landeskunde Sachsen', 'Ab welchem Alter darf man in Sachsen bei Kommunalwahlen wählen?', '14', '16', '18', '20', 'b', 424, true),
+  ('Sachsen-5', 'bundesland', 'Sachsen', 'Landeskunde Sachsen', 'Welche Farben hat die Landesflagge von Sachsen?', 'blau-weiß-rot', 'weiß-grün', 'grün-weiß-rot', 'schwarz-gelb', 'b', 425, true),
+  ('Sachsen-6', 'bundesland', 'Sachsen', 'Landeskunde Sachsen', 'Wo können Sie sich in Sachsen über politische Themen informieren?', 'bei der Landeszentrale für politische Bildung', 'beim Ordnungsamt der Gemeinde', 'bei den Kirchen', 'bei der Verbraucherzentrale', 'a', 426, true),
+  ('Sachsen-7', 'bundesland', 'Sachsen', 'Landeskunde Sachsen', 'Die Landeshauptstadt von Sachsen heißt …', 'Leipzig.', 'Dresden.', 'Chemnitz.', 'Zwickau.', 'b', 427, true),
+  ('Sachsen-8', 'bundesland', 'Sachsen', 'Landeskunde Sachsen', 'Welches Bundesland ist Sachsen?', '1', '2', '3', '4', 'a', 428, false),
+  ('Sachsen-9', 'bundesland', 'Sachsen', 'Landeskunde Sachsen', 'Wie nennt man die Regierungschefin/den Regierungschef in Sachsen?', 'Erste Ministerin/Erster Minister', 'Premierministerin/Premierminister', 'Bürgermeisterin/Bürgermeister', 'Ministerpräsidentin/Ministerpräsident', 'd', 429, true),
+  ('Sachsen-10', 'bundesland', 'Sachsen', 'Landeskunde Sachsen', 'Welche Ministerin/welchen Minister hat Sachsen nicht?', 'Justizministerin/Justizminister', 'Außenministerin/Außenminister', 'Finanzministerin/Finanzminister', 'Innenministerin/Innenminister', 'b', 430, true),
+  ('Sachsen-Anhalt-1', 'bundesland', 'Sachsen-Anhalt', 'Landeskunde Sachsen-Anhalt', 'Welches Wappen gehört zum Bundesland Sachsen-Anhalt? Bild 1 Bild 2 Bild 3 Bild 4', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'a', 431, false),
+  ('Sachsen-Anhalt-2', 'bundesland', 'Sachsen-Anhalt', 'Landeskunde Sachsen-Anhalt', 'Welches ist ein Landkreis in Sachsen-Anhalt?', 'Ammerland', 'Altötting', 'Uckermark', 'Börde', 'd', 432, true),
+  ('Sachsen-Anhalt-3', 'bundesland', 'Sachsen-Anhalt', 'Landeskunde Sachsen-Anhalt', 'Für wie viele Jahre wird der Landtag in Sachsen-Anhalt gewählt?', '3', '4', '5', '6', 'c', 433, true),
+  ('Sachsen-Anhalt-4', 'bundesland', 'Sachsen-Anhalt', 'Landeskunde Sachsen-Anhalt', 'Ab welchem Alter darf man in Sachsen-Anhalt bei Kommunalwahlen wählen?', '14', '16', '18', '20', 'b', 434, true),
+  ('Sachsen-Anhalt-5', 'bundesland', 'Sachsen-Anhalt', 'Landeskunde Sachsen-Anhalt', 'Welche Farben hat die Landesflagge von Sachsen-Anhalt?', 'blau-weiß-rot', 'gelb-schwarz', 'grün-weiß-rot', 'weiß-rot', 'b', 435, true),
+  ('Sachsen-Anhalt-6', 'bundesland', 'Sachsen-Anhalt', 'Landeskunde Sachsen-Anhalt', 'Wo können Sie sich in Sachsen-Anhalt über politische Themen informieren?', 'bei den Kirchen', 'bei der Landeszentrale für politische Bildung', 'beim Ordnungsamt der Gemeinde', 'bei der Verbraucherzentrale', 'b', 436, true),
+  ('Sachsen-Anhalt-7', 'bundesland', 'Sachsen-Anhalt', 'Landeskunde Sachsen-Anhalt', 'Die Landeshauptstadt von Sachsen-Anhalt heißt …', 'Halle.', 'Dessau.', 'Magdeburg.', 'Wittenberg.', 'c', 437, true),
+  ('Sachsen-Anhalt-8', 'bundesland', 'Sachsen-Anhalt', 'Landeskunde Sachsen-Anhalt', 'Welches Bundesland ist Sachsen-Anhalt?', '1', '2', '3', '4', 'a', 438, false),
+  ('Sachsen-Anhalt-9', 'bundesland', 'Sachsen-Anhalt', 'Landeskunde Sachsen-Anhalt', 'Wie nennt man die Regierungschefin/den Regierungschef in Sachsen-Anhalt?', 'Erste Ministerin/Erster Minister', 'Premierministerin/Premierminister', 'Bürgermeisterin/Bürgermeister', 'Ministerpräsidentin/Ministerpräsident', 'd', 439, true),
+  ('Sachsen-Anhalt-10', 'bundesland', 'Sachsen-Anhalt', 'Landeskunde Sachsen-Anhalt', 'Welche Ministerin/welchen Minister hat Sachsen-Anhalt nicht?', 'Justizministerin/Justizminister', 'Außenministerin/Außenminister', 'Finanzministerin/Finanzminister', 'Innenministerin/Innenminister', 'b', 440, true),
+  ('Schleswig-Holstein-1', 'bundesland', 'Schleswig-Holstein', 'Landeskunde Schleswig-Holstein', 'Welches Wappen gehört zum Bundesland Schleswig-Holstein? Bild 1 Bild 2 Bild 3 Bild 4', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'a', 441, false),
+  ('Schleswig-Holstein-2', 'bundesland', 'Schleswig-Holstein', 'Landeskunde Schleswig-Holstein', 'Welches ist ein Landkreis in Schleswig-Holstein?', 'Ammerland', 'Mecklenburgische Seenplatte', 'Nordfriesland', 'Rhein-Sieg-Kreis', 'c', 442, true),
+  ('Schleswig-Holstein-3', 'bundesland', 'Schleswig-Holstein', 'Landeskunde Schleswig-Holstein', 'Für wie viele Jahre wird der Landtag in Schleswig-Holstein gewählt?', '3', '4', '5', '6', 'c', 443, true),
+  ('Schleswig-Holstein-4', 'bundesland', 'Schleswig-Holstein', 'Landeskunde Schleswig-Holstein', 'Ab welchem Alter darf man in Schleswig-Holstein bei Kommunalwahlen wählen?', '14', '16', '18', '20', 'b', 444, true),
+  ('Schleswig-Holstein-5', 'bundesland', 'Schleswig-Holstein', 'Landeskunde Schleswig-Holstein', 'Welche Farben hat die Landesflagge von Schleswig-Holstein?', 'weiß-blau', 'blau-weiß-rot', 'weiß-rot', 'grün-weiß-rot', 'b', 445, true),
+  ('Schleswig-Holstein-6', 'bundesland', 'Schleswig-Holstein', 'Landeskunde Schleswig-Holstein', 'Wo können Sie sich in Schleswig-Holstein über politische Themen informieren?', 'bei der Verbraucherzentrale', 'beim Ordnungsamt der Gemeinde', 'beim / bei der Landesbeauftragten für politische Bildung', 'bei den Kirchen', 'c', 446, true),
+  ('Schleswig-Holstein-7', 'bundesland', 'Schleswig-Holstein', 'Landeskunde Schleswig-Holstein', 'Die Landeshauptstadt von Schleswig-Holstein heißt …', 'Husum.', 'Flensburg.', 'Lübeck.', 'Kiel.', 'd', 447, true),
+  ('Schleswig-Holstein-8', 'bundesland', 'Schleswig-Holstein', 'Landeskunde Schleswig-Holstein', 'Welches Bundesland ist Schleswig-Holstein?', '1', '2', '3', '4', 'a', 448, false),
+  ('Schleswig-Holstein-9', 'bundesland', 'Schleswig-Holstein', 'Landeskunde Schleswig-Holstein', 'Wie nennt man die Regierungschefin/den Regierungschef in Schleswig-Holstein?', 'Erste Ministerin/Erster Minister', 'Premierministerin/Premierminister', 'Bürgermeisterin/Bürgermeister', 'Ministerpräsidentin/Ministerpräsident', 'd', 449, true),
+  ('Schleswig-Holstein-10', 'bundesland', 'Schleswig-Holstein', 'Landeskunde Schleswig-Holstein', 'Welche Ministerin/welchen Minister hat Schleswig-Holstein nicht?', 'Justizministerin/Justizminister', 'Außenministerin/Außenminister', 'Finanzministerin/Finanzminister', 'Innenministerin/Innenminister', 'b', 450, true),
+  ('Thüringen-1', 'bundesland', 'Thüringen', 'Landeskunde Thüringen', 'Welches Wappen gehört zum Freistaat Thüringen? Bild 1 Bild 2 Bild 3 Bild 4', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'a', 451, false),
+  ('Thüringen-2', 'bundesland', 'Thüringen', 'Landeskunde Thüringen', 'Welches ist ein Landkreis in Thüringen?', 'Ammerland', 'Altötting', 'Nordfriesland', 'Wartburgkreis', 'd', 452, true),
+  ('Thüringen-3', 'bundesland', 'Thüringen', 'Landeskunde Thüringen', 'Für wie viele Jahre wird der Landtag in Thüringen gewählt?', '3', '4', '5', '6', 'c', 453, true),
+  ('Thüringen-4', 'bundesland', 'Thüringen', 'Landeskunde Thüringen', 'Ab welchem Alter darf man in Thüringen bei Kommunalwahlen wählen?', '14', '16', '18', '20', 'b', 454, true),
+  ('Thüringen-5', 'bundesland', 'Thüringen', 'Landeskunde Thüringen', 'Welche Farben hat die Landesflagge von Thüringen?', 'blau-weiß-rot', 'weiß-rot', 'grün-weiß-rot', 'schwarz-gold', 'b', 455, true),
+  ('Thüringen-6', 'bundesland', 'Thüringen', 'Landeskunde Thüringen', 'Wo können Sie sich in Thüringen über politische Themen informieren?', 'bei den Kirchen', 'bei der Verbraucherzentrale', 'bei der Landeszentrale für politische Bildung', 'beim Ordnungsamt der Gemeinde', 'c', 456, true),
+  ('Thüringen-7', 'bundesland', 'Thüringen', 'Landeskunde Thüringen', 'Die Landeshauptstadt von Thüringen heißt …', 'Eisenach.', 'Erfurt.', 'Gera.', 'Jena.', 'b', 457, true),
+  ('Thüringen-8', 'bundesland', 'Thüringen', 'Landeskunde Thüringen', 'Welches Bundesland ist Thüringen?', '1', '2', '3', '4', 'a', 458, false),
+  ('Thüringen-9', 'bundesland', 'Thüringen', 'Landeskunde Thüringen', 'Wie nennt man die Regierungschefin/den Regierungschef in Thüringen?', 'Erste Ministerin/Erster Minister', 'Premierministerin/Premierminister', 'Bürgermeisterin/Bürgermeister', 'Ministerpräsidentin/Ministerpräsident', 'd', 459, true),
+  ('Thüringen-10', 'bundesland', 'Thüringen', 'Landeskunde Thüringen', 'Welche Ministerin/welchen Minister hat Thüringen nicht?', 'Justizministerin/Justizminister', 'Außenministerin/Außenminister', 'Finanzministerin/Finanzminister', 'Innenministerin/Innenminister', 'b', 460, true);
+
+commit;

@@ -1,0 +1,48 @@
+begin;
+
+insert into public.civics_exam_questions (
+  external_number, scope, bundesland, topic_category, question_text,
+  option_a, option_b, option_c, option_d, correct_option, sort_order, is_active
+) values
+  ('Bremen-1', 'bundesland', 'Bremen', 'Landeskunde Bremen', 'Welches Wappen gehört zur Freien Hansestadt Bremen? Bild 1 Bild 2 Bild 3 Bild 4', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'a', 341, false),
+  ('Bremen-2', 'bundesland', 'Bremen', 'Landeskunde Bremen', 'Welches ist ein Stadtteil von Bremen?', 'Altona', 'Hemelingen', 'Pankow', 'Babelsberg', 'b', 342, true),
+  ('Bremen-3', 'bundesland', 'Bremen', 'Landeskunde Bremen', 'Für wie viele Jahre wird das Landesparlament in Bremen gewählt?', '3', '4', '5', '6', 'b', 343, true),
+  ('Bremen-4', 'bundesland', 'Bremen', 'Landeskunde Bremen', 'Ab welchem Alter darf man in Bremen bei den Wahlen zur Bürgerschaft (Landtag) wählen?', '14', '16', '18', '20', 'b', 344, true),
+  ('Bremen-5', 'bundesland', 'Bremen', 'Landeskunde Bremen', 'Welche Farben hat die Landesflagge von Bremen?', 'blau-weiß-rot', 'rot-weiß', 'grün-weiß-rot', 'schwarz-gold', 'b', 345, true),
+  ('Bremen-6', 'bundesland', 'Bremen', 'Landeskunde Bremen', 'Wo können Sie sich in Bremen über politische Themen informieren?', 'beim Ordnungsamt der Gemeinde', 'bei der Landeszentrale für politische Bildung', 'bei den Kirchen', 'bei der Verbraucherzentrale', 'b', 346, true),
+  ('Bremen-7', 'bundesland', 'Bremen', 'Landeskunde Bremen', 'Was ist ein deutscher Stadtstaat?', 'Bremen', 'München', 'Frankfurt', 'Erfurt', 'a', 347, true),
+  ('Bremen-8', 'bundesland', 'Bremen', 'Landeskunde Bremen', 'Welches Bundesland ist Bremen?', '1', '2', '3', '4', 'a', 348, false),
+  ('Bremen-9', 'bundesland', 'Bremen', 'Landeskunde Bremen', 'Wie nennt man die Regierungschefin/den Regierungschef des Stadtstaates Bremen?', 'Ministerpräsidentin/Ministerpräsident', 'Erste Bürgermeisterin/Erster Bürgermeister', 'Präsidentin/Präsident des Senates', 'Regierende Bürgermeisterin/Regierender Bürgermeister', 'c', 349, true),
+  ('Bremen-10', 'bundesland', 'Bremen', 'Landeskunde Bremen', 'Welche Senatorin/welchen Senator hat Bremen nicht?', 'Senatorin/Senator für Außenbeziehungen', 'Finanzsenatorin/Finanzsenator', 'Justizsenatorin/Justizsenator', 'Innensenatorin/Innensenator', 'a', 350, true),
+  ('Hamburg-1', 'bundesland', 'Hamburg', 'Landeskunde Hamburg', 'Welches Wappen gehört zur Freien und Hansestadt Hamburg? Bild 1 Bild 2 Bild 3 Bild 4', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'a', 351, false),
+  ('Hamburg-2', 'bundesland', 'Hamburg', 'Landeskunde Hamburg', 'Welches ist ein Bezirk von Hamburg?', 'Altona', 'Hemelingen', 'Pankow', 'Mecklenburgische Seenplatte', 'a', 352, true),
+  ('Hamburg-3', 'bundesland', 'Hamburg', 'Landeskunde Hamburg', 'Für wie viele Jahre wird das Landesparlament in Hamburg gewählt?', '3', '4', '5', '6', 'c', 353, true),
+  ('Hamburg-4', 'bundesland', 'Hamburg', 'Landeskunde Hamburg', 'Ab welchem Alter darf man in Hamburg bei Kommunalwahlen (Wahl der Bezirksversammlungen) wählen?', '14', '16', '18', '20', 'b', 354, true),
+  ('Hamburg-5', 'bundesland', 'Hamburg', 'Landeskunde Hamburg', 'Welche Farben hat die Landesflagge von Hamburg?', 'blau-weiß-rot', 'weiß-rot', 'grün-weiß-rot', 'schwarz-gelb', 'b', 355, true),
+  ('Hamburg-6', 'bundesland', 'Hamburg', 'Landeskunde Hamburg', 'Wo können Sie sich in Hamburg über politische Themen informieren?', 'beim Ordnungsamt der Gemeinde', 'bei der Verbraucherzentrale', 'bei den Kirchen', 'bei der Landeszentrale für politische Bildung', 'd', 356, true),
+  ('Hamburg-7', 'bundesland', 'Hamburg', 'Landeskunde Hamburg', 'Welches Bundesland ist ein Stadtstaat?', 'Hamburg', 'Sachsen', 'Bayern', 'Thüringen', 'a', 357, true),
+  ('Hamburg-8', 'bundesland', 'Hamburg', 'Landeskunde Hamburg', 'Welches Bundesland ist Hamburg?', '1', '2', '3', '4', 'a', 358, false),
+  ('Hamburg-9', 'bundesland', 'Hamburg', 'Landeskunde Hamburg', 'Wie nennt man die Regierungschefin/den Regierungschef des Stadtstaates Hamburg?', 'Ministerpräsidentin/Ministerpräsident', 'Erste Bürgermeisterin/Erster Bürgermeister', 'Regierende Senatorin/Regierender Senator', 'Oberbürgermeisterin/Oberbürgermeister', 'b', 359, true),
+  ('Hamburg-10', 'bundesland', 'Hamburg', 'Landeskunde Hamburg', 'Welche Senatorin/welchen Senator hat Hamburg nicht?', 'Justizsenatorin/Justizsenator', 'Senatorin/Senator für Außenbeziehungen', 'Finanzsenatorin/Finanzsenator', 'Innensenatorin/Innensenator', 'b', 360, true),
+  ('Hessen-1', 'bundesland', 'Hessen', 'Landeskunde Hessen', 'Welches Wappen gehört zum Bundesland Hessen? Bild 1 Bild 2 Bild 3 Bild 4', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'a', 361, false),
+  ('Hessen-2', 'bundesland', 'Hessen', 'Landeskunde Hessen', 'Welches ist ein Landkreis in Hessen?', 'Ammerland', 'Altötting', 'Prignitz', 'Main-Taunus-Kreis', 'd', 362, true),
+  ('Hessen-3', 'bundesland', 'Hessen', 'Landeskunde Hessen', 'Für wie viele Jahre wird der Landtag in Hessen gewählt?', '3', '4', '5', '6', 'c', 363, true),
+  ('Hessen-4', 'bundesland', 'Hessen', 'Landeskunde Hessen', 'Ab welchem Alter darf man in Hessen bei Kommunalwahlen wählen?', '14', '16', '18', '20', 'c', 364, true),
+  ('Hessen-5', 'bundesland', 'Hessen', 'Landeskunde Hessen', 'Welche Farben hat die Landesflagge von Hessen?', 'blau-weiß-rot', 'rot-weiß', 'schwarz-gold', 'grün-weiß-rot', 'b', 365, true),
+  ('Hessen-6', 'bundesland', 'Hessen', 'Landeskunde Hessen', 'Wo können Sie sich in Hessen über politische Themen informieren?', 'bei der Landeszentrale für politische Bildung', 'bei der Verbraucherzentrale', 'beim Ordnungsamt der Gemeinde', 'bei den Kirchen', 'a', 366, true),
+  ('Hessen-7', 'bundesland', 'Hessen', 'Landeskunde Hessen', 'Die Landeshauptstadt von Hessen heißt …', 'Kassel.', 'Darmstadt.', 'Frankfurt.', 'Wiesbaden.', 'd', 367, true),
+  ('Hessen-8', 'bundesland', 'Hessen', 'Landeskunde Hessen', 'Welches Bundesland ist Hessen?', '1', '2', '3', '4', 'a', 368, false),
+  ('Hessen-9', 'bundesland', 'Hessen', 'Landeskunde Hessen', 'Wie nennt man die Regierungschefin/den Regierungschef in Hessen?', 'Erste Ministerin/Erster Minister', 'Premierministerin/Premierminister', 'Bürgermeisterin/Bürgermeister', 'Ministerpräsidentin/Ministerpräsident', 'd', 369, true),
+  ('Hessen-10', 'bundesland', 'Hessen', 'Landeskunde Hessen', 'Welche Ministerin/welchen Minister hat Hessen nicht?', 'Justizministerin/Justizminister', 'Außenministerin/Außenminister', 'Finanzministerin/Finanzminister', 'Innenministerin/Innenminister', 'b', 370, true),
+  ('Mecklenburg-Vorpommern-1', 'bundesland', 'Mecklenburg-Vorpommern', 'Landeskunde Mecklenburg-Vorpommern', 'Welches Wappen gehört zum Bundesland Mecklenburg-Vorpommern? Bild 1 Bild 2 Bild 3 Bild 4', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'a', 371, false),
+  ('Mecklenburg-Vorpommern-2', 'bundesland', 'Mecklenburg-Vorpommern', 'Landeskunde Mecklenburg-Vorpommern', 'Welches ist ein Landkreis in Mecklenburg-Vorpommern?', 'Prignitz', 'Mecklenburgische Seenplatte', 'Vogtlandkreis', 'Rhein-Sieg-Kreis', 'b', 372, true),
+  ('Mecklenburg-Vorpommern-3', 'bundesland', 'Mecklenburg-Vorpommern', 'Landeskunde Mecklenburg-Vorpommern', 'Für wie viele Jahre wird der Landtag in Mecklenburg-Vorpommern gewählt?', '3', '4', '5', '6', 'c', 373, true),
+  ('Mecklenburg-Vorpommern-4', 'bundesland', 'Mecklenburg-Vorpommern', 'Landeskunde Mecklenburg-Vorpommern', 'Ab welchem Alter darf man in Mecklenburg-Vorpommern bei Kommunalwahlen wählen?', '14', '16', '18', '20', 'b', 374, true),
+  ('Mecklenburg-Vorpommern-5', 'bundesland', 'Mecklenburg-Vorpommern', 'Landeskunde Mecklenburg-Vorpommern', 'Welche Farben hat die Landesflagge von Mecklenburg-Vorpommern?', 'schwarz-rot-gold', 'blau-weiß-gelb-rot', 'grün-weiß-rot', 'schwarz-gelb', 'b', 375, true),
+  ('Mecklenburg-Vorpommern-6', 'bundesland', 'Mecklenburg-Vorpommern', 'Landeskunde Mecklenburg-Vorpommern', 'Wo können Sie sich in Mecklenburg-Vorpommern über politische Themen informieren?', 'bei der Landeszentrale für politische Bildung', 'bei den Kirchen', 'beim Ordnungsamt der Gemeinde', 'bei der Verbraucherzentrale', 'a', 376, true),
+  ('Mecklenburg-Vorpommern-7', 'bundesland', 'Mecklenburg-Vorpommern', 'Landeskunde Mecklenburg-Vorpommern', 'Die Landeshauptstadt von Mecklenburg-Vorpommern heißt …', 'Greifswald.', 'Schwerin.', 'Rostock.', 'Wismar.', 'b', 377, true),
+  ('Mecklenburg-Vorpommern-8', 'bundesland', 'Mecklenburg-Vorpommern', 'Landeskunde Mecklenburg-Vorpommern', 'Welches Bundesland ist Mecklenburg-Vorpommern?', '1', '2', '3', '4', 'a', 378, false),
+  ('Mecklenburg-Vorpommern-9', 'bundesland', 'Mecklenburg-Vorpommern', 'Landeskunde Mecklenburg-Vorpommern', 'Wie nennt man die Regierungschefin/den Regierungschef in Mecklenburg-Vorpommern?', 'Erste Ministerin/Erster Minister', 'Premierministerin/Premierminister', 'Bürgermeisterin/Bürgermeister', 'Ministerpräsidentin/Ministerpräsident', 'd', 379, true),
+  ('Mecklenburg-Vorpommern-10', 'bundesland', 'Mecklenburg-Vorpommern', 'Landeskunde Mecklenburg-Vorpommern', 'Welche Ministerin/welchen Minister hat Mecklenburg-Vorpommern nicht?', 'Justizministerin/Justizminister', 'Außenministerin/Außenminister', 'Finanzministerin/Finanzminister', 'Innenministerin/Innenminister', 'b', 380, true);
+
+commit;

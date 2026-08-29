@@ -1,0 +1,48 @@
+begin;
+
+insert into public.civics_exam_questions (
+  external_number, scope, bundesland, topic_category, question_text,
+  option_a, option_b, option_c, option_d, correct_option, sort_order, is_active
+) values
+  ('Baden-Württemberg-1', 'bundesland', 'Baden-Württemberg', 'Landeskunde Baden-Württemberg', 'Welches Wappen gehört zum Bundesland Baden-Württemberg? Bild 1 Bild 2 Bild 3 Bild 4', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'a', 301, false),
+  ('Baden-Württemberg-2', 'bundesland', 'Baden-Württemberg', 'Landeskunde Baden-Württemberg', 'Welches ist ein Landkreis in Baden-Württemberg?', 'Mecklenburgische Seenplatte', 'Neckar-Odenwald-Kreis', 'Nordfriesland', 'Altötting', 'b', 302, true),
+  ('Baden-Württemberg-3', 'bundesland', 'Baden-Württemberg', 'Landeskunde Baden-Württemberg', 'Für wie viele Jahre wird der Landtag in Baden-Württemberg gewählt?', '3', '4', '5', '6', 'c', 303, true),
+  ('Baden-Württemberg-4', 'bundesland', 'Baden-Württemberg', 'Landeskunde Baden-Württemberg', 'Ab welchem Alter darf man in Baden-Württemberg bei Kommunalwahlen wählen?', '14', '16', '18', '20', 'b', 304, true),
+  ('Baden-Württemberg-5', 'bundesland', 'Baden-Württemberg', 'Landeskunde Baden-Württemberg', 'Welche Farben hat die Landesflagge von Baden-Württemberg?', 'blau-weiß-rot', 'schwarz-gold', 'weiß-blau', 'grün-weiß-rot', 'b', 305, true),
+  ('Baden-Württemberg-6', 'bundesland', 'Baden-Württemberg', 'Landeskunde Baden-Württemberg', 'Wo können Sie sich in Baden-Württemberg über politische Themen informieren?', 'beim Ordnungsamt der Gemeinde', 'bei der Verbraucherzentrale', 'bei der Landeszentrale für politische Bildung', 'bei den Kirchen', 'c', 306, true),
+  ('Baden-Württemberg-7', 'bundesland', 'Baden-Württemberg', 'Landeskunde Baden-Württemberg', 'Die Landeshauptstadt von Baden-Württemberg heißt …', 'Heidelberg.', 'Stuttgart.', 'Karlsruhe.', 'Mannheim.', 'b', 307, true),
+  ('Baden-Württemberg-8', 'bundesland', 'Baden-Württemberg', 'Landeskunde Baden-Württemberg', 'Welches Bundesland ist Baden-Württemberg?', '1', '2', '3', '4', 'a', 308, false),
+  ('Baden-Württemberg-9', 'bundesland', 'Baden-Württemberg', 'Landeskunde Baden-Württemberg', 'Wie nennt man die Regierungschefin/den Regierungschef in Baden-Württemberg?', 'Erste Ministerin/Erster Minister', 'Premierministerin/Premierminister', 'Bürgermeisterin/Bürgermeister', 'Ministerpräsidentin/Ministerpräsident', 'd', 309, true),
+  ('Baden-Württemberg-10', 'bundesland', 'Baden-Württemberg', 'Landeskunde Baden-Württemberg', 'Welche Ministerin/welchen Minister hat Baden-Württemberg nicht?', 'Finanzministerin/Finanzminister', 'Justizministerin/Justizminister', 'Innenministerin/Innenminister', 'Außenministerin/Außenminister', 'd', 310, true),
+  ('Bayern-1', 'bundesland', 'Bayern', 'Landeskunde Bayern', 'Welches Wappen gehört zum Freistaat Bayern? Bild 1 Bild 2 Bild 3 Bild 4', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'a', 311, false),
+  ('Bayern-2', 'bundesland', 'Bayern', 'Landeskunde Bayern', 'Welches ist ein Landkreis in Bayern?', 'Prignitz', 'Rhein-Sieg-Kreis', 'Nordfriesland', 'Altötting', 'd', 312, true),
+  ('Bayern-3', 'bundesland', 'Bayern', 'Landeskunde Bayern', 'Für wie viele Jahre wird der Landtag in Bayern gewählt?', '3', '4', '5', '6', 'c', 313, true),
+  ('Bayern-4', 'bundesland', 'Bayern', 'Landeskunde Bayern', 'Ab welchem Alter darf man in Bayern bei Kommunalwahlen wählen?', '14', '16', '18', '20', 'c', 314, true),
+  ('Bayern-5', 'bundesland', 'Bayern', 'Landeskunde Bayern', 'Welche Farben hat die Landesflagge von Bayern?', 'blau-weiß-rot', 'weiß-blau', 'grün-weiß-rot', 'schwarz-gelb', 'b', 315, true),
+  ('Bayern-6', 'bundesland', 'Bayern', 'Landeskunde Bayern', 'Wo können Sie sich in Bayern über politische Themen informieren?', 'beim Ordnungsamt der Gemeinde', 'bei der Landeszentrale für politische Bildung', 'bei der Verbraucherzentrale', 'bei den Kirchen', 'b', 316, true),
+  ('Bayern-7', 'bundesland', 'Bayern', 'Landeskunde Bayern', 'Die Landeshauptstadt von Bayern heißt …', 'Ingolstadt.', 'Regensburg.', 'Nürnberg.', 'München.', 'd', 317, true),
+  ('Bayern-8', 'bundesland', 'Bayern', 'Landeskunde Bayern', 'Welches Bundesland ist Bayern?', '1', '2', '3', '4', 'a', 318, false),
+  ('Bayern-9', 'bundesland', 'Bayern', 'Landeskunde Bayern', 'Wie nennt man die Regierungschefin/den Regierungschef in Bayern?', 'Erste Ministerin/Erster Minister', 'Premierministerin/Premierminister', 'Bürgermeisterin/Bürgermeister', 'Ministerpräsidentin/Ministerpräsident', 'd', 319, true),
+  ('Bayern-10', 'bundesland', 'Bayern', 'Landeskunde Bayern', 'Welche Ministerin/welchen Minister hat Bayern nicht?', 'Justizministerin/Justizminister', 'Außenministerin/Außenminister', 'Finanzministerin/Finanzminister', 'Innenministerin/Innenminister', 'b', 320, true),
+  ('Berlin-1', 'bundesland', 'Berlin', 'Landeskunde Berlin', 'Welches Wappen gehört zum Bundesland Berlin? Bild 1 Bild 2 Bild 3 Bild 4', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'a', 321, false),
+  ('Berlin-2', 'bundesland', 'Berlin', 'Landeskunde Berlin', 'Welches ist ein Bezirk von Berlin?', 'Altona', 'Prignitz', 'Pankow', 'Mecklenburgische Seenplatte', 'c', 322, true),
+  ('Berlin-3', 'bundesland', 'Berlin', 'Landeskunde Berlin', 'Für wie viele Jahre wird das Landesparlament in Berlin gewählt?', '3', '4', '5', '6', 'c', 323, true),
+  ('Berlin-4', 'bundesland', 'Berlin', 'Landeskunde Berlin', 'Ab welchem Alter darf man in Berlin bei Kommunalwahlen (Wahl der Bezirksverordnetenversammlung) wählen?', '14', '16', '18', '20', 'b', 324, true),
+  ('Berlin-5', 'bundesland', 'Berlin', 'Landeskunde Berlin', 'Welche Farben hat die Landesflagge von Berlin?', 'blau-weiß-rot', 'weiß-rot', 'grün-weiß-rot', 'schwarz-gold', 'b', 325, true),
+  ('Berlin-6', 'bundesland', 'Berlin', 'Landeskunde Berlin', 'Wo können Sie sich in Berlin über politische Themen informieren?', 'beim Ordnungsamt der Gemeinde', 'bei den Kirchen', 'bei der Verbraucherzentrale', 'bei der Landeszentrale für politische Bildung', 'd', 326, true),
+  ('Berlin-7', 'bundesland', 'Berlin', 'Landeskunde Berlin', 'Welches Bundesland ist ein Stadtstaat?', 'Berlin', 'Saarland', 'Brandenburg', 'Hessen', 'a', 327, true),
+  ('Berlin-8', 'bundesland', 'Berlin', 'Landeskunde Berlin', 'Welches Bundesland ist Berlin?', '1', '2', '3', '4', 'a', 328, false),
+  ('Berlin-9', 'bundesland', 'Berlin', 'Landeskunde Berlin', 'Wie nennt man die Regierungschefin/den Regierungschef des Stadtstaates Berlin?', 'Ministerpräsidentin/Ministerpräsident', 'Oberbürgermeisterin/Oberbürgermeister', 'Präsidentin/Präsident des Senates', 'Regierende Bürgermeisterin/Regierender Bürgermeister', 'd', 329, true),
+  ('Berlin-10', 'bundesland', 'Berlin', 'Landeskunde Berlin', 'Welche Senatorin/welchen Senator hat Berlin nicht?', 'Finanzsenatorin/Finanzsenator', 'Innensenatorin/Innensenator', 'Senatorin/Senator für Außenbeziehungen', 'Justizsenatorin/Justizsenator', 'c', 330, true),
+  ('Brandenburg-1', 'bundesland', 'Brandenburg', 'Landeskunde Brandenburg', 'Welches Wappen gehört zum Bundesland Brandenburg? Bild 1 Bild 2 Bild 3 Bild 4', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'a', 331, false),
+  ('Brandenburg-2', 'bundesland', 'Brandenburg', 'Landeskunde Brandenburg', 'Welches ist ein Landkreis in Brandenburg?', 'Prignitz', 'Rhein-Sieg-Kreis', 'Vogtlandkreis', 'Amberg-Sulzbach', 'a', 332, true),
+  ('Brandenburg-3', 'bundesland', 'Brandenburg', 'Landeskunde Brandenburg', 'Für wie viele Jahre wird der Landtag in Brandenburg gewählt?', '3', '4', '5', '6', 'c', 333, true),
+  ('Brandenburg-4', 'bundesland', 'Brandenburg', 'Landeskunde Brandenburg', 'Ab welchem Alter darf man in Brandenburg bei Kommunalwahlen wählen?', '14', '16', '18', '20', 'b', 334, true),
+  ('Brandenburg-5', 'bundesland', 'Brandenburg', 'Landeskunde Brandenburg', 'Welche Farben hat die Landesflagge von Brandenburg?', 'blau-weiß-rot', 'rot-weiß', 'grün-weiß-rot', 'schwarz-gelb', 'b', 335, true),
+  ('Brandenburg-6', 'bundesland', 'Brandenburg', 'Landeskunde Brandenburg', 'Wo können Sie sich in Brandenburg über politische Themen informieren?', 'bei den Kirchen', 'beim Ordnungsamt der Gemeinde', 'bei der Landeszentrale für politische Bildung', 'bei der Verbraucherzentrale', 'c', 336, true),
+  ('Brandenburg-7', 'bundesland', 'Brandenburg', 'Landeskunde Brandenburg', 'Die Landeshauptstadt von Brandenburg heißt …', 'Potsdam.', 'Cottbus.', 'Brandenburg.', 'Frankfurt/Oder.', 'a', 337, true),
+  ('Brandenburg-8', 'bundesland', 'Brandenburg', 'Landeskunde Brandenburg', 'Welches Bundesland ist Brandenburg?', '1', '2', '3', '4', 'a', 338, false),
+  ('Brandenburg-9', 'bundesland', 'Brandenburg', 'Landeskunde Brandenburg', 'Wie nennt man die Regierungschefin/den Regierungschef in Brandenburg?', 'Erste Ministerin/Erster Minister', 'Premierministerin/Premierminister', 'Bürgermeisterin/Bürgermeister', 'Ministerpräsidentin/Ministerpräsident', 'd', 339, true),
+  ('Brandenburg-10', 'bundesland', 'Brandenburg', 'Landeskunde Brandenburg', 'Welche Ministerin/welchen Minister hat Brandenburg nicht?', 'Justizministerin/Justizminister', 'Außenministerin/Außenminister', 'Finanzministerin/Finanzminister', 'Innenministerin/Innenminister', 'b', 340, true);
+
+commit;

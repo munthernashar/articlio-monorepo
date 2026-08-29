@@ -1,0 +1,48 @@
+begin;
+
+insert into public.civics_exam_questions (
+  external_number, scope, bundesland, topic_category, question_text,
+  option_a, option_b, option_c, option_d, correct_option, sort_order, is_active
+) values
+  ('Niedersachsen-1', 'bundesland', 'Niedersachsen', 'Landeskunde Niedersachsen', 'Welches Wappen gehört zum Bundesland Niedersachsen? Bild 1 Bild 2 Bild 3 Bild 4', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'a', 381, false),
+  ('Niedersachsen-2', 'bundesland', 'Niedersachsen', 'Landeskunde Niedersachsen', 'Welches ist ein Landkreis in Niedersachsen?', 'Ammerland', 'Rhein-Sieg-Kreis', 'Nordfriesland', 'Vogtlandkreis', 'a', 382, true),
+  ('Niedersachsen-3', 'bundesland', 'Niedersachsen', 'Landeskunde Niedersachsen', 'Für wie viele Jahre wird der Landtag in Niedersachsen gewählt?', '3', '4', '5', '6', 'c', 383, true),
+  ('Niedersachsen-4', 'bundesland', 'Niedersachsen', 'Landeskunde Niedersachsen', 'Ab welchem Alter darf man in Niedersachsen bei Kommunalwahlen wählen?', '14', '16', '18', '20', 'b', 384, true),
+  ('Niedersachsen-5', 'bundesland', 'Niedersachsen', 'Landeskunde Niedersachsen', 'Welche Farben hat die Landesflagge von Niedersachsen?', 'weiß-blau', 'schwarz-rot-gold', 'schwarz-gelb', 'blau-weiß-rot', 'b', 385, true),
+  ('Niedersachsen-6', 'bundesland', 'Niedersachsen', 'Landeskunde Niedersachsen', 'Wo können Sie sich in Niedersachsen über politische Themen informieren?', 'bei der Landeszentrale für politische Bildung', 'beim Ordnungsamt der Gemeinde', 'bei der Verbraucherzentrale', 'bei den Kirchen', 'a', 386, true),
+  ('Niedersachsen-7', 'bundesland', 'Niedersachsen', 'Landeskunde Niedersachsen', 'Die Landeshauptstadt von Niedersachsen heißt …', 'Hannover.', 'Braunschweig.', 'Wolfsburg.', 'Osnabrück.', 'a', 387, true),
+  ('Niedersachsen-8', 'bundesland', 'Niedersachsen', 'Landeskunde Niedersachsen', 'Welches Bundesland ist Niedersachsen?', '1', '2', '3', '4', 'a', 388, false),
+  ('Niedersachsen-9', 'bundesland', 'Niedersachsen', 'Landeskunde Niedersachsen', 'Wie nennt man die Regierungschefin/den Regierungschef in Niedersachsen?', 'Erste Ministerin/Erster Minister', 'Premierministerin/Premierminister', 'Bürgermeisterin/Bürgermeister', 'Ministerpräsidentin/Ministerpräsident', 'd', 389, true),
+  ('Niedersachsen-10', 'bundesland', 'Niedersachsen', 'Landeskunde Niedersachsen', 'Welche Ministerin/welchen Minister hat Niedersachsen nicht?', 'Justizministerin/Justizminister', 'Außenministerin/Außenminister', 'Finanzministerin/Finanzminister', 'Innenministerin/Innenminister', 'b', 390, true),
+  ('Nordrhein-Westfalen-1', 'bundesland', 'Nordrhein-Westfalen', 'Landeskunde Nordrhein-Westfalen', 'Welches Wappen gehört zum Bundesland Nordrhein-Westfalen? Bild 1 Bild 2 Bild 3 Bild 4', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'a', 391, false),
+  ('Nordrhein-Westfalen-2', 'bundesland', 'Nordrhein-Westfalen', 'Landeskunde Nordrhein-Westfalen', 'Welches ist ein Landkreis in Nordrhein-Westfalen?', 'Ammerland', 'Rhein-Sieg-Kreis', 'Nordfriesland', 'Vogtlandkreis', 'b', 392, true),
+  ('Nordrhein-Westfalen-3', 'bundesland', 'Nordrhein-Westfalen', 'Landeskunde Nordrhein-Westfalen', 'Für wie viele Jahre wird der Landtag in Nordrhein-Westfalen gewählt?', '3', '4', '5', '6', 'c', 393, true),
+  ('Nordrhein-Westfalen-4', 'bundesland', 'Nordrhein-Westfalen', 'Landeskunde Nordrhein-Westfalen', 'Ab welchem Alter darf man in Nordrhein-Westfalen bei Kommunalwahlen wählen?', '14', '16', '18', '20', 'b', 394, true),
+  ('Nordrhein-Westfalen-5', 'bundesland', 'Nordrhein-Westfalen', 'Landeskunde Nordrhein-Westfalen', 'Welche Farben hat die Landesflagge von Nordrhein-Westfalen?', 'rot-weiß', 'grün-weiß-rot', 'schwarz-gold', 'blau-weiß-rot', 'b', 395, true),
+  ('Nordrhein-Westfalen-6', 'bundesland', 'Nordrhein-Westfalen', 'Landeskunde Nordrhein-Westfalen', 'Wo können Sie sich in Nordrhein-Westfalen über politische Themen informieren?', 'bei den Kirchen', 'beim Ordnungsamt der Gemeinde', 'bei der Verbraucherzentrale', 'bei der Landeszentrale für politische Bildung', 'd', 396, true),
+  ('Nordrhein-Westfalen-7', 'bundesland', 'Nordrhein-Westfalen', 'Landeskunde Nordrhein-Westfalen', 'Die Landeshauptstadt von Nordrhein-Westfalen heißt …', 'Köln.', 'Bonn.', 'Düsseldorf.', 'Dortmund.', 'c', 397, true),
+  ('Nordrhein-Westfalen-8', 'bundesland', 'Nordrhein-Westfalen', 'Landeskunde Nordrhein-Westfalen', 'Welches Bundesland ist Nordrhein-Westfalen?', '1', '2', '3', '4', 'a', 398, false),
+  ('Nordrhein-Westfalen-9', 'bundesland', 'Nordrhein-Westfalen', 'Landeskunde Nordrhein-Westfalen', 'Wie nennt man die Regierungschefin/den Regierungschef in Nordrhein-Westfalen?', 'Erste Ministerin/Erster Minister', 'Premierministerin/Premierminister', 'Bürgermeisterin/Bürgermeister', 'Ministerpräsidentin/Ministerpräsident', 'd', 399, true),
+  ('Nordrhein-Westfalen-10', 'bundesland', 'Nordrhein-Westfalen', 'Landeskunde Nordrhein-Westfalen', 'Welche Ministerin/welchen Minister hat Nordrhein-Westfalen nicht?', 'Justizministerin/Justizminister', 'Außenministerin/Außenminister', 'Finanzministerin/Finanzminister', 'Innenministerin/Innenminister', 'b', 400, true),
+  ('Rheinland-Pfalz-1', 'bundesland', 'Rheinland-Pfalz', 'Landeskunde Rheinland-Pfalz', 'Welches Wappen gehört zum Bundesland Rheinland-Pfalz? Bild 1 Bild 2 Bild 3 Bild 4', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'a', 401, false),
+  ('Rheinland-Pfalz-2', 'bundesland', 'Rheinland-Pfalz', 'Landeskunde Rheinland-Pfalz', 'Welches ist ein Landkreis in Rheinland-Pfalz?', 'Westerwaldkreis', 'Altötting', 'Emsland', 'Prignitz', 'a', 402, true),
+  ('Rheinland-Pfalz-3', 'bundesland', 'Rheinland-Pfalz', 'Landeskunde Rheinland-Pfalz', 'Für wie viele Jahre wird der Landtag in Rheinland-Pfalz gewählt?', '3', '4', '5', '6', 'c', 403, true),
+  ('Rheinland-Pfalz-4', 'bundesland', 'Rheinland-Pfalz', 'Landeskunde Rheinland-Pfalz', 'Ab welchem Alter darf man in Rheinland-Pfalz bei Kommunalwahlen wählen?', '14', '16', '18', '20', 'b', 404, true),
+  ('Rheinland-Pfalz-5', 'bundesland', 'Rheinland-Pfalz', 'Landeskunde Rheinland-Pfalz', 'Welche Farben hat die Landesflagge von Rheinland-Pfalz?', 'weiß-rot', 'schwarz-rot-gold', 'schwarz-gelb', 'grün-weiß-rot', 'b', 405, true),
+  ('Rheinland-Pfalz-6', 'bundesland', 'Rheinland-Pfalz', 'Landeskunde Rheinland-Pfalz', 'Wo können Sie sich in Rheinland-Pfalz über politische Themen informieren?', 'bei den Kirchen', 'bei der Verbraucherzentrale', 'beim Ordnungsamt der Gemeinde', 'bei der Landeszentrale für politische Bildung', 'd', 406, true),
+  ('Rheinland-Pfalz-7', 'bundesland', 'Rheinland-Pfalz', 'Landeskunde Rheinland-Pfalz', 'Die Landeshauptstadt von Rheinland-Pfalz heißt …', 'Mainz.', 'Kaiserslautern.', 'Ludwigshafen.', 'Koblenz.', 'a', 407, true),
+  ('Rheinland-Pfalz-8', 'bundesland', 'Rheinland-Pfalz', 'Landeskunde Rheinland-Pfalz', 'Welches Bundesland ist Rheinland-Pfalz?', '1', '2', '3', '4', 'a', 408, false),
+  ('Rheinland-Pfalz-9', 'bundesland', 'Rheinland-Pfalz', 'Landeskunde Rheinland-Pfalz', 'Wie nennt man die Regierungschefin/den Regierungschef in Rheinland-Pfalz?', 'Erste Ministerin/Erster Minister', 'Premierministerin/Premierminister', 'Bürgermeisterin/Bürgermeister', 'Ministerpräsidentin/Ministerpräsident', 'd', 409, true),
+  ('Rheinland-Pfalz-10', 'bundesland', 'Rheinland-Pfalz', 'Landeskunde Rheinland-Pfalz', 'Welche Ministerin/welchen Minister hat Rheinland-Pfalz nicht?', 'Justizministerin/Justizminister', 'Außenministerin/Außenminister', 'Finanzministerin/Finanzminister', 'Innenministerin/Innenminister', 'b', 410, true),
+  ('Saarland-1', 'bundesland', 'Saarland', 'Landeskunde Saarland', 'Welches Wappen gehört zum Bundesland Saarland? Bild 1 Bild 2 Bild 3 Bild 4', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'a', 411, false),
+  ('Saarland-2', 'bundesland', 'Saarland', 'Landeskunde Saarland', 'Welches ist ein Landkreis im Saarland?', 'Mecklenburgische Seenplatte', 'Altötting', 'Neunkirchen', 'Rhein-Sieg-Kreis', 'c', 412, true),
+  ('Saarland-3', 'bundesland', 'Saarland', 'Landeskunde Saarland', 'Für wie viele Jahre wird der Landtag des Saarlandes gewählt?', '3', '4', '5', '6', 'c', 413, true),
+  ('Saarland-4', 'bundesland', 'Saarland', 'Landeskunde Saarland', 'Ab welchem Alter darf man im Saarland bei Kommunalwahlen wählen?', '14', '16', '18', '20', 'c', 414, true),
+  ('Saarland-5', 'bundesland', 'Saarland', 'Landeskunde Saarland', 'Welche Farben hat die Landesflagge des Saarlandes?', 'weiß-blau', 'schwarz-rot-gold', 'schwarz-gelb', 'grün-weiß-rot', 'b', 415, true),
+  ('Saarland-6', 'bundesland', 'Saarland', 'Landeskunde Saarland', 'Wo können Sie sich im Saarland über politische Themen informieren?', 'bei den Kirchen', 'bei der Landeszentrale für politische Bildung', 'bei der Verbraucherzentrale', 'beim Ordnungsamt der Gemeinde', 'b', 416, true),
+  ('Saarland-7', 'bundesland', 'Saarland', 'Landeskunde Saarland', 'Die Landeshauptstadt des Saarlandes heißt …', 'Neunkirchen.', 'Homburg.', 'Saarbrücken.', 'Völklingen.', 'c', 417, true),
+  ('Saarland-8', 'bundesland', 'Saarland', 'Landeskunde Saarland', 'Welches Bundesland ist das Saarland?', '1', '2', '3', '4', 'a', 418, false),
+  ('Saarland-9', 'bundesland', 'Saarland', 'Landeskunde Saarland', 'Wie nennt man die Regierungschefin/den Regierungschef des Saarlandes?', 'Erste Ministerin/Erster Minister', 'Premierministerin/Premierminister', 'Bürgermeisterin/Bürgermeister', 'Ministerpräsidentin/Ministerpräsident', 'd', 419, true),
+  ('Saarland-10', 'bundesland', 'Saarland', 'Landeskunde Saarland', 'Welche Ministerin/welchen Minister hat das Saarland nicht?', 'Justizministerin/Justizminister', 'Außenministerin/Außenminister', 'Finanzministerin/Finanzminister', 'Innenministerin/Innenminister', 'b', 420, true);
+
+commit;
