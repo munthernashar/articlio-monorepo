@@ -1,5 +1,5 @@
 // Shared TypeScript Types for Articlio
-// Extracted from src/types/database.ts of the original app
+// Database schema types used by the shared Supabase API package.
 
 export type Json =
   | string
@@ -9,7 +9,6 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-// Database Schema Types (from Supabase)
 export interface Database {
   public: {
     Tables: {
@@ -38,6 +37,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       sessions: {
         Row: {
@@ -61,6 +61,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       prompts: {
         Row: {
@@ -87,20 +88,28 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
     }
-    Views: {}
-    Functions: {}
-    Enums: {}
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
 }
 
-// Convenience type exports
 export type Profile = Database['public']['Tables']['profiles']['Row']
 export type Session = Database['public']['Tables']['sessions']['Row']
 export type Prompt = Database['public']['Tables']['prompts']['Row']
 
-// API Response Types
 export interface ApiResponse<T> {
   data: T | null
   error: { message: string } | null
