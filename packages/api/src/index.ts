@@ -1,5 +1,5 @@
-// Shared Supabase API for Articlio
-export { supabase, createSupabaseClient } from './client'
+// Shared, platform-agnostic Supabase API for Articlio
+export { configureSupabaseClient, getSupabaseClient } from './client'
 export type { SupabaseClient } from './client'
 export * from './auth'
 export * from './profile'
