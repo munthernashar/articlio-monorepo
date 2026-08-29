@@ -1,0 +1,15 @@
+# LOCAL DEVELOPMENT ONLY - Vercel ignores this
+# This file is for local pnpm/turbo development
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    }
+  }
+}
