@@ -8,14 +8,13 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx",
-    "typecheck": "tsc --noEmit",
-    "postinstall": "cd ../.. && npm install --workspace=@articlio/types --workspace=@articlio/api --workspace=@articlio/utils --workspace=@articlio/ui || true"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@articlio/api": "file:../../packages/api",
-    "@articlio/types": "file:../../packages/types",
-    "@articlio/utils": "file:../../packages/utils",
-    "@articlio/ui": "file:../../packages/ui",
+    "@articlio/api": "*",
+    "@articlio/types": "*",
+    "@articlio/utils": "*",
+    "@articlio/ui": "*",
     "@sentry/react": "^8.0.0",
     "@supabase/supabase-js": "^2.45.0",
     "react": "^19.0.0",
