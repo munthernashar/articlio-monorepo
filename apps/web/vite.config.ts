@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
+      '@': path.resolve(__dirname, './src'),
       '@articlio/api': path.resolve(__dirname, '../../packages/api/src/index.ts'),
       '@articlio/types': path.resolve(__dirname, '../../packages/types/src/index.ts'),
       '@articlio/utils': path.resolve(__dirname, '../../packages/utils/src/index.ts'),
