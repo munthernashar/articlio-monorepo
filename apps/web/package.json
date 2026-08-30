@@ -10,10 +10,10 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@articlio/api": "workspace:*",
-    "@articlio/types": "workspace:*",
-    "@articlio/utils": "workspace:*",
-    "@articlio/ui": "workspace:*",
+    "@articlio/api": "file:../../packages/api",
+    "@articlio/types": "file:../../packages/types",
+    "@articlio/utils": "file:../../packages/utils",
+    "@articlio/ui": "file:../../packages/ui",
     "@supabase/supabase-js": "^2.45.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
