@@ -14,9 +14,9 @@
     "clean": "rm -rf .expo node_modules"
   },
   "dependencies": {
-    "@articlio/api": "*",
-    "@articlio/types": "*",
-    "@articlio/utils": "*",
+    "@articlio/api": "workspace:*",
+    "@articlio/types": "workspace:*",
+    "@articlio/utils": "workspace:*",
     "expo": "~57.0.0",
     "expo-constants": "~57.0.15",
     "expo-linking": "~57.0.8",
