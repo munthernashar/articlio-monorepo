@@ -1,18 +1,18 @@
 {
   "name": "@articlio/api",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "private": true,
+  "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
-  "scripts": {
-    "lint": "eslint src/**/*.ts",
-    "typecheck": "tsc --noEmit"
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
   },
   "dependencies": {
-    "@articlio/types": "*",
     "@supabase/supabase-js": "^2.45.0"
-  },
-  "devDependencies": {
-    "typescript": "^5.7.0"
   }
 }
