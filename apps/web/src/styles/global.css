@@ -2035,6 +2035,155 @@ a {
   font-size: var(--text-sm);
 }
 
+/* Gamification-Widget (07.09.2026): bewusst sekundär -- steht unter dem primären
+   .dashboard-grid, kleinere Überschrift, gedeckte Surface-Töne statt eigener Hero-Optik, damit
+   das Dashboard mit seiner Übersicht (nächster Schritt, Skill Map, Sessions) die Hauptrolle
+   behält und Level/Erfolge/Leaderboard als Ergänzung wirken statt sie zu verdrängen. */
+.gamification-summary {
+  margin-top: 1.5rem;
+}
+
+.gamification-summary-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.gamification-summary-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.gamification-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.gamification-stat {
+  background: var(--surface-2);
+  border-radius: var(--radius-m);
+  padding: 0.85rem 1rem;
+}
+
+.gamification-stat-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  margin-bottom: 0.4rem;
+}
+
+.gamification-stat-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.gamification-achievements {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(4.75rem, 1fr));
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+}
+
+.gamification-achievement {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.6rem 0.4rem;
+  border-radius: var(--radius-m);
+  border: 1px solid var(--glass-border);
+  background: var(--surface-2);
+  text-align: center;
+}
+
+.gamification-achievement--unlocked {
+  border-color: color-mix(in srgb, var(--color-warning) 45%, var(--glass-border));
+  background: color-mix(in srgb, var(--color-warning) 12%, var(--surface-2));
+}
+
+.gamification-achievement--locked {
+  opacity: 0.55;
+}
+
+.gamification-achievement-icon {
+  font-size: 1.4rem;
+}
+
+.gamification-achievement-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.gamification-achievement-xp {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.gamification-subheading {
+  margin: 0 0 0.5rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.gamification-leaderboard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.gamification-leaderboard-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-m);
+  background: var(--surface-2);
+}
+
+.gamification-leaderboard-row--top1 {
+  background: color-mix(in srgb, var(--color-warning) 14%, var(--surface-2));
+}
+
+.gamification-leaderboard-name {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+}
+
+.gamification-leaderboard-rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  font-size: 0.75rem;
+  background: var(--surface-1);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.gamification-leaderboard-row--top1 .gamification-leaderboard-rank {
+  background: color-mix(in srgb, var(--color-warning) 55%, var(--surface-1));
+  color: var(--text-primary);
+}
+
 .skeleton {
   display: block;
   border-radius: var(--radius-s);
