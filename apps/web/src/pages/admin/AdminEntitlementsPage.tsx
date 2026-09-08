@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { userEntitlementsService } from '@/services/supabase/user-entitlements.service';
+import { userEntitlementsService, type AdminUserSearchResult } from '@/services/supabase/user-entitlements.service';
 import type { UserEntitlementStatus } from '@/types/user-entitlements';
 
 type EntitlementFormState = {
@@ -26,6 +26,52 @@ const INITIAL_FORM: EntitlementFormState = {
   status: 'active',
 };
 
+// Backoffice-Zuweisung ohne Bezahlung (07.09.2026): Werte 1:1 gespiegelt aus
+// supabase/functions/stripe-webhook/index.ts (PLAN_CONFIGS + FREE_PLAN_CONFIG) und aus
+// grant_free_entitlement() (Migration 20260827170000ff.) -- reine Ausfüllhilfe für dieses
+// Formular, admin kann jeden Wert danach noch von Hand anpassen. Bei einer künftigen
+// Preis-/Limit-Änderung dort UND hier nachziehen (kein automatischer Abgleich, wie auch sonst
+// in diesem Codebase üblich, siehe z. B. model-pricing.ts-Duplikate zwischen Client/Edge).
+type PlanTemplate = {
+  key: string;
+  label: string;
+  planKey: string;
+  sessionsPerDayLimit: number;
+  maxSessionLengthSeconds: number;
+  dailyConversationSecondsLimit: number | null;
+  monthlyTokenLimit: number | null;
+};
+
+const PLAN_TEMPLATES: PlanTemplate[] = [
+  {
+    key: 'free',
+    label: 'Free (kostenlos, 1 Session/Tag, 3 Min)',
+    planKey: 'free',
+    sessionsPerDayLimit: 1,
+    maxSessionLengthSeconds: 180,
+    dailyConversationSecondsLimit: null,
+    monthlyTokenLimit: 200000,
+  },
+  {
+    key: 'starter',
+    label: 'Starter (5 €/Monat, 1 Session/Tag, 15 Min)',
+    planKey: 'starter',
+    sessionsPerDayLimit: 1,
+    maxSessionLengthSeconds: 900,
+    dailyConversationSecondsLimit: null,
+    monthlyTokenLimit: 300000,
+  },
+  {
+    key: 'pro',
+    label: 'Pro (9 €/Monat, 1 Session/Tag, 15 Min, Coach)',
+    planKey: 'pro',
+    sessionsPerDayLimit: 1,
+    maxSessionLengthSeconds: 900,
+    dailyConversationSecondsLimit: null,
+    monthlyTokenLimit: 1200000,
+  },
+];
+
 export function AdminEntitlementsPage() {
   const [form, setForm] = useState<EntitlementFormState>(INITIAL_FORM);
   const [loading, setLoading] = useState(false);
@@ -33,8 +79,14 @@ export function AdminEntitlementsPage() {
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const loadUserEntitlement = async () => {
-    if (!form.userId.trim()) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<AdminUserSearchResult[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+
+  const loadUserEntitlement = async (userIdOverride?: string) => {
+    const userId = (userIdOverride ?? form.userId).trim();
+    if (!userId) {
       setErrorMessage('Bitte eine User-ID eingeben.');
       return;
     }
@@ -44,9 +96,10 @@ export function AdminEntitlementsPage() {
     setInfoMessage(null);
 
     try {
-      const entry = await userEntitlementsService.getByUserId(form.userId.trim());
+      const entry = await userEntitlementsService.getByUserId(userId);
 
       if (!entry) {
+        setForm((current) => ({ ...current, userId }));
         setInfoMessage('Kein Override vorhanden. Du kannst unten einen neuen Eintrag speichern.');
         return;
       }
@@ -69,6 +122,47 @@ export function AdminEntitlementsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const searchUsers = async () => {
+    if (searchQuery.trim().length < 2) {
+      setSearchError('Bitte mindestens 2 Zeichen eingeben.');
+      return;
+    }
+
+    setSearching(true);
+    setSearchError(null);
+
+    try {
+      const results = await userEntitlementsService.searchUsersByEmail(searchQuery.trim());
+      setSearchResults(results);
+      if (results.length === 0) {
+        setSearchError('Keine Nutzer gefunden.');
+      }
+    } catch (error) {
+      setSearchError(error instanceof Error ? error.message : 'Nutzersuche fehlgeschlagen.');
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const selectSearchResult = (result: AdminUserSearchResult) => {
+    void loadUserEntitlement(result.userId);
+  };
+
+  const applyPlanTemplate = (templateKey: string) => {
+    const template = PLAN_TEMPLATES.find((entry) => entry.key === templateKey);
+    if (!template) return;
+
+    setForm((current) => ({
+      ...current,
+      planKey: template.planKey,
+      sessionsPerDayLimit: template.sessionsPerDayLimit,
+      maxSessionLengthSeconds: template.maxSessionLengthSeconds,
+      dailyConversationSecondsLimit: template.dailyConversationSecondsLimit?.toString() ?? '',
+      monthlyTokenLimit: template.monthlyTokenLimit?.toString() ?? '',
+    }));
+    setInfoMessage(`Vorlage "${template.label}" übernommen -- vor dem Speichern bei Bedarf noch anpassen.`);
   };
 
   const save = async () => {
@@ -107,6 +201,48 @@ export function AdminEntitlementsPage() {
     <section className="page">
       {errorMessage ? <article className="card auth-error">{errorMessage}</article> : null}
       {infoMessage ? <article className="card auth-info">{infoMessage}</article> : null}
+
+      <article className="card admin-form-card">
+        <label className="auth-label" htmlFor="ent-search-email">Nutzer per E-Mail suchen</label>
+        <div className="button-row" style={{ justifyContent: 'flex-start', gap: '0.5rem' }}>
+          <input
+            id="ent-search-email"
+            className="auth-input"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                void searchUsers();
+              }
+            }}
+            placeholder="z. B. munther@ oder gmx.de"
+          />
+          <button type="button" className="button button-secondary" onClick={searchUsers} disabled={searching}>
+            {searching ? 'Suche …' : 'Suchen'}
+          </button>
+        </div>
+        {searchError ? <p className="auth-error">{searchError}</p> : null}
+        {searchResults.length > 0 ? (
+          <ul className="admin-log-list">
+            {searchResults.map((result) => (
+              <li key={result.userId}>
+                <button
+                  type="button"
+                  className="button button-secondary"
+                  onClick={() => selectSearchResult(result)}
+                  style={{ width: '100%', textAlign: 'left' }}
+                >
+                  {result.email ?? result.userId} — {result.displayName ?? 'ohne Namen'} · aktuell:{' '}
+                  {result.currentPlanKey ?? 'kein Entitlement'}
+                  {result.currentStatus ? ` (${result.currentStatus})` : ''}
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </article>
+
       <article className="card admin-form-card">
         <label className="auth-label" htmlFor="ent-user-id">User-ID</label>
         <input
@@ -117,10 +253,28 @@ export function AdminEntitlementsPage() {
           placeholder="UUID aus auth.users / profiles.id"
         />
         <div className="button-row" style={{ justifyContent: 'flex-start' }}>
-          <button type="button" className="button button-secondary" onClick={loadUserEntitlement} disabled={loading}>
+          <button type="button" className="button button-secondary" onClick={() => loadUserEntitlement()} disabled={loading}>
             {loading ? 'Lade …' : 'Vorhandenes Entitlement laden'}
           </button>
         </div>
+
+        <label className="auth-label" htmlFor="ent-plan-template">Paket-Vorlage (füllt die Felder unten aus)</label>
+        <select
+          id="ent-plan-template"
+          className="auth-input"
+          defaultValue=""
+          onChange={(event) => {
+            if (event.target.value) applyPlanTemplate(event.target.value);
+            event.target.value = '';
+          }}
+        >
+          <option value="">— Vorlage wählen —</option>
+          {PLAN_TEMPLATES.map((template) => (
+            <option key={template.key} value={template.key}>
+              {template.label}
+            </option>
+          ))}
+        </select>
 
         <label className="auth-label" htmlFor="ent-plan-key">Plan-Key</label>
         <input

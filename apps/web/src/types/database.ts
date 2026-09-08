@@ -1005,6 +1005,17 @@ export interface Database {
         };
         Returns: undefined;
       };
+      admin_find_users_by_email: {
+        Args: { p_query: string };
+        Returns: {
+          user_id: string;
+          email: string | null;
+          display_name: string | null;
+          role: string;
+          current_plan_key: string | null;
+          current_status: string | null;
+        }[];
+      };
     };
     Enums: {
       user_role: UserRole;

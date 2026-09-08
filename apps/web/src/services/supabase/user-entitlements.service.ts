@@ -9,6 +9,15 @@ function asStatus(value: string): UserEntitlementStatus {
   return ENTITLEMENT_STATUSES.includes(value as UserEntitlementStatus) ? (value as UserEntitlementStatus) : 'active';
 }
 
+export type AdminUserSearchResult = {
+  userId: string;
+  email: string | null;
+  displayName: string | null;
+  role: string;
+  currentPlanKey: string | null;
+  currentStatus: string | null;
+};
+
 function mapEntitlement(row: UserEntitlementRow): UserEntitlement {
   return {
     userId: row.user_id,
@@ -102,5 +111,28 @@ export const userEntitlementsService = {
     }
 
     return mapEntitlement(data);
+  },
+
+  /**
+   * Admin-Backoffice: sucht Nutzer per (Teil-)E-Mail, damit AdminEntitlementsPage nicht mehr
+   * die rohe user_entitlements.user_id (UUID) voraussetzt -- vorher musste die ID separat per
+   * SQL nachgeschlagen werden. Ruft die admin_find_users_by_email-RPC (security definer,
+   * prüft is_admin() serverseitig) auf; für Nicht-Admins wirft der Aufruf einen Fehler.
+   */
+  async searchUsersByEmail(query: string): Promise<AdminUserSearchResult[]> {
+    const { data, error } = await supabaseClient.rpc('admin_find_users_by_email', { p_query: query });
+
+    if (error) {
+      throw new Error(`Nutzersuche fehlgeschlagen: ${error.message}`);
+    }
+
+    return (data ?? []).map((row) => ({
+      userId: row.user_id,
+      email: row.email,
+      displayName: row.display_name,
+      role: row.role,
+      currentPlanKey: row.current_plan_key,
+      currentStatus: row.current_status,
+    }));
   },
 };
